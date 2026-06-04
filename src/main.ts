@@ -40,6 +40,8 @@ async function init() {
   // 引导卡片点击
   document.getElementById('welcome-ai-play')?.addEventListener('click', () => navigateTo('ai-play'));
   document.getElementById('welcome-analysis')?.addEventListener('click', () => navigateTo('analysis'));
+  document.getElementById('welcome-tutorial')?.addEventListener('click', () => navigateTo('tutorial'));
+  document.getElementById('welcome-puzzle')?.addEventListener('click', () => navigateTo('puzzle'));
 }
 
 init().catch(console.error);

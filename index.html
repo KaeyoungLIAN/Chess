@@ -43,6 +43,22 @@
             </div>
             <div class="welcome-card-arrow">→</div>
           </div>
+          <div class="welcome-card" id="welcome-tutorial">
+            <div class="welcome-card-icon">📖</div>
+            <div class="welcome-card-body">
+              <h3>教学课程</h3>
+              <p>系统学习国际象棋基础知识与进阶技巧</p>
+            </div>
+            <div class="welcome-card-arrow">→</div>
+          </div>
+          <div class="welcome-card" id="welcome-puzzle">
+            <div class="welcome-card-icon">🧩</div>
+            <div class="welcome-card-body">
+              <h3>残局挑战</h3>
+              <p>练习经典残局，提升局面判断与战术能力</p>
+            </div>
+            <div class="welcome-card-arrow">→</div>
+          </div>
         </div>
         <p class="welcome-footer">引擎在浏览器本地运行，无需服务器</p>
       </div>
@@ -138,6 +154,26 @@
             <div id="analysis-move-list" class="move-list"></div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ 教学课程视图 ═══════════ -->
+    <div id="view-tutorial" class="view">
+      <div class="placeholder-view">
+        <div class="placeholder-icon">📖</div>
+        <h2 class="placeholder-title">教学课程</h2>
+        <p class="placeholder-desc">即将上线，敬请期待</p>
+        <button class="btn btn-primary" onclick="document.getElementById('view-tutorial').classList.remove('active');document.getElementById('view-welcome').classList.add('active')">返回首页</button>
+      </div>
+    </div>
+
+    <!-- ═══════════ 残局挑战视图 ═══════════ -->
+    <div id="view-puzzle" class="view">
+      <div class="placeholder-view">
+        <div class="placeholder-icon">🧩</div>
+        <h2 class="placeholder-title">残局挑战</h2>
+        <p class="placeholder-desc">即将上线，敬请期待</p>
+        <button class="btn btn-primary" onclick="document.getElementById('view-puzzle').classList.remove('active');document.getElementById('view-welcome').classList.add('active')">返回首页</button>
       </div>
     </div>
 
