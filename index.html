@@ -11,109 +11,136 @@
     <header class="app-header">
       <h1>Chess Trainer</h1>
       <p class="subtitle">国际象棋自学平台</p>
-      <nav class="nav-tabs">
-        <button class="nav-btn active" data-view="ai-play">AI 对战</button>
-        <button class="nav-btn" data-view="analysis">复盘分析</button>
-      </nav>
     </header>
-    <main id="main-content">
-      <!-- ═══════════ AI 对战视图 ═══════════ -->
-      <div id="view-ai-play" class="view active">
-        <div class="game-layout">
-          <div class="board-section">
-            <div id="chess-board"></div>
+
+    <!-- ═══════════ 引导页 ═══════════ -->
+    <div id="view-welcome" class="view active">
+      <div class="welcome-container">
+        <div class="welcome-hero">
+          <div class="welcome-icon">
+            <svg viewBox="0 0 100 100" width="64" height="64">
+              <path fill="var(--primary)" d="M50 5C25 5 5 25 5 50s20 45 45 45 45-20 45-45S75 5 50 5zm0 80c-19.3 0-35-15.7-35-35s15.7-35 35-35 35 15.7 35 35-15.7 35-35 35z"/>
+              <text x="50" y="68" text-anchor="middle" font-size="44" fill="var(--primary)" font-family="serif">♟</text>
+            </svg>
           </div>
-          <div class="side-panel">
-            <div id="panel-setup" class="panel-section">
-              <h3>对局设置</h3>
-              <div class="difficulty-selector">
-                <label>AI 难度</label>
-                <div class="difficulty-slider-container">
-                  <input type="range" id="difficulty-slider" min="1" max="10" value="5" />
-                  <span id="difficulty-label" class="badge badge-level">Lv. 5</span>
-                </div>
-              </div>
-              <div class="color-selector">
-                <label>执棋</label>
-                <div class="btn-group">
-                  <button id="color-white" class="btn btn-sm active">白棋</button>
-                  <button id="color-black" class="btn btn-sm">黑棋</button>
-                  <button id="color-random" class="btn btn-sm">随机</button>
-                </div>
-              </div>
-              <button id="btn-start-game" class="btn btn-primary btn-full">开始对局</button>
+          <h2 class="welcome-title">提升你的棋艺</h2>
+          <p class="welcome-desc">与 Stockfish AI 对战，或导入棋局进行深度复盘分析</p>
+        </div>
+        <div class="welcome-cards">
+          <div class="welcome-card" id="welcome-ai-play">
+            <div class="welcome-card-icon">🤖</div>
+            <div class="welcome-card-body">
+              <h3>AI 对战</h3>
+              <p>选择难度和执棋，与本地 Stockfish 引擎对战</p>
             </div>
-            <div id="panel-game" class="panel-section hidden">
-              <h3>对局控制</h3>
-              <div class="game-info-row">
-                <span id="game-info-difficulty" class="badge badge-level">Lv. 5</span>
-                <span id="game-info-turn" class="game-turn-indicator">白棋走</span>
+            <div class="welcome-card-arrow">→</div>
+          </div>
+          <div class="welcome-card" id="welcome-analysis">
+            <div class="welcome-card-icon">📊</div>
+            <div class="welcome-card-body">
+              <h3>复盘分析</h3>
+              <p>导入 PGN 棋局，逐路引擎分析，评估每步得失</p>
+            </div>
+            <div class="welcome-card-arrow">→</div>
+          </div>
+        </div>
+        <p class="welcome-footer">引擎在浏览器本地运行，无需服务器</p>
+      </div>
+    </div>
+
+    <!-- ═══════════ AI 对战视图 ═══════════ -->
+    <div id="view-ai-play" class="view">
+      <div class="game-layout">
+        <div class="board-section">
+          <div id="chess-board"></div>
+        </div>
+        <div class="side-panel">
+          <div id="panel-setup" class="panel-section">
+            <h3>对局设置</h3>
+            <div class="difficulty-selector">
+              <label>AI 难度</label>
+              <div class="difficulty-slider-container">
+                <input type="range" id="difficulty-slider" min="1" max="10" value="5" />
+                <span id="difficulty-label" class="badge badge-level">Lv. 5</span>
               </div>
-              <div class="game-actions">
-                <button id="btn-undo" class="btn btn-secondary" disabled>悔棋</button>
-                <button id="btn-flip-board" class="btn btn-secondary">翻转棋盘</button>
-                <button id="btn-resign" class="btn btn-danger">认输</button>
+            </div>
+            <div class="color-selector">
+              <label>执棋</label>
+              <div class="btn-group">
+                <button id="color-white" class="btn btn-sm active">白棋</button>
+                <button id="color-black" class="btn btn-sm">黑棋</button>
+                <button id="color-random" class="btn btn-sm">随机</button>
               </div>
-              <button id="btn-back-to-setup" class="btn btn-ghost btn-full">返回设置</button>
             </div>
-            <div class="panel-section move-history">
-              <h3>走棋记录</h3>
-              <div id="move-list" class="move-list"></div>
+            <button id="btn-start-game" class="btn btn-primary btn-full">开始对局</button>
+          </div>
+          <div id="panel-game" class="panel-section hidden">
+            <h3>对局控制</h3>
+            <div class="game-info-row">
+              <span id="game-info-difficulty" class="badge badge-level">Lv. 5</span>
+              <span id="game-info-turn" class="game-turn-indicator">白棋走</span>
             </div>
-            <div id="game-status" class="panel-section game-status">
-              <span id="status-text">设置好难度和执棋，点击开始</span>
-              <button id="btn-download-pgn" class="btn btn-ghost btn-full hidden" style="margin-top:8px;">下载 PGN</button>
+            <div class="game-actions">
+              <button id="btn-undo" class="btn btn-secondary" disabled>悔棋</button>
+              <button id="btn-flip-board" class="btn btn-secondary">翻转棋盘</button>
+              <button id="btn-resign" class="btn btn-danger">认输</button>
             </div>
+            <button id="btn-back-to-setup" class="btn btn-ghost btn-full">返回设置</button>
+          </div>
+          <div class="panel-section move-history">
+            <h3>走棋记录</h3>
+            <div id="move-list" class="move-list"></div>
+          </div>
+          <div id="game-status" class="panel-section game-status">
+            <span id="status-text">设置好难度和执棋，点击开始</span>
+            <button id="btn-download-pgn" class="btn btn-ghost btn-full hidden" style="margin-top:8px;">下载 PGN</button>
           </div>
         </div>
       </div>
-      <!-- ═══════════ 复盘分析视图 ═══════════ -->
-      <div id="view-analysis" class="view">
-        <div class="game-layout">
-          <div class="board-section">
-            <div id="analysis-board"></div>
-            <!-- 评估柱 -->
-            <div id="eval-bar-container">
-              <div id="eval-bar-track">
-                <div id="eval-bar-fill"></div>
-                <span id="eval-bar-label">0.00</span>
-              </div>
-            </div>
-          </div>
-          <div class="side-panel">
-            <!-- 导入区 -->
-            <div class="panel-section">
-              <h3>导入棋局</h3>
-              <textarea id="pgn-input" placeholder="粘贴 PGN 格式棋局..." rows="5"></textarea>
-              <button id="btn-load-pgn" class="btn btn-primary btn-full">加载复盘并分析</button>
-            </div>
-            <!-- 导航 + 详情 -->
-            <div id="analysis-nav-section" class="panel-section hidden">
-              <h3>复盘控制</h3>
-              <div class="nav-controls">
-                <button id="btn-first" class="btn btn-sm" title="第一步">⏮</button>
-                <button id="btn-prev" class="btn btn-sm" title="上一步">◀</button>
-                <span id="move-counter">0 / 0</span>
-                <button id="btn-next" class="btn btn-sm" title="下一步">▶</button>
-                <button id="btn-last" class="btn btn-sm" title="最后一步">⏭</button>
-              </div>
-            </div>
-            <!-- 引擎分析详情 -->
-            <div id="analysis-detail" class="panel-section hidden">
-              <h3>引擎分析</h3>
-              <div id="analysis-best-line" class="analysis-best-line"></div>
-              <div id="analysis-multi-pv" class="analysis-multi-pv"></div>
-              <div id="analysis-blink" class="analysis-blink"></div>
-            </div>
-            <!-- 棋谱 + 每步评估 -->
-            <div class="panel-section move-history" style="flex:1;">
-              <h3>棋谱</h3>
-              <div id="analysis-move-list" class="move-list"></div>
+    </div>
+
+    <!-- ═══════════ 复盘分析视图 ═══════════ -->
+    <div id="view-analysis" class="view">
+      <div class="game-layout">
+        <div class="board-section">
+          <div id="analysis-board"></div>
+          <div id="eval-bar-container">
+            <div id="eval-bar-track">
+              <div id="eval-bar-fill"></div>
+              <span id="eval-bar-label">0.00</span>
             </div>
           </div>
         </div>
+        <div class="side-panel">
+          <div class="panel-section">
+            <h3>导入棋局</h3>
+            <textarea id="pgn-input" placeholder="粘贴 PGN 格式棋局..." rows="5"></textarea>
+            <button id="btn-load-pgn" class="btn btn-primary btn-full">加载复盘并分析</button>
+          </div>
+          <div id="analysis-nav-section" class="panel-section hidden">
+            <h3>复盘控制</h3>
+            <div class="nav-controls">
+              <button id="btn-first" class="btn btn-sm" title="第一步">⏮</button>
+              <button id="btn-prev" class="btn btn-sm" title="上一步">◀</button>
+              <span id="move-counter">0 / 0</span>
+              <button id="btn-next" class="btn btn-sm" title="下一步">▶</button>
+              <button id="btn-last" class="btn btn-sm" title="最后一步">⏭</button>
+            </div>
+          </div>
+          <div id="analysis-detail" class="panel-section hidden">
+            <h3>引擎分析</h3>
+            <div id="analysis-best-line" class="analysis-best-line"></div>
+            <div id="analysis-multi-pv" class="analysis-multi-pv"></div>
+            <div id="analysis-blink" class="analysis-blink"></div>
+          </div>
+          <div class="panel-section move-history" style="flex:1;">
+            <h3>棋谱</h3>
+            <div id="analysis-move-list" class="move-list"></div>
+          </div>
+        </div>
       </div>
-    </main>
+    </div>
+
     <div id="loading-overlay" class="loading-overlay hidden">
       <div class="loading-spinner"></div>
       <p>正在加载引擎...</p>

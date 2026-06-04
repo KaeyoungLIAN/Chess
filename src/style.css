@@ -90,31 +90,112 @@ body {
   letter-spacing: 0.05em;
 }
 
-/* ── Tabs ── */
-.nav-tabs {
-  display: inline-flex;
-  background: var(--bg-secondary);
-  border-radius: var(--radius);
-  padding: 3px;
-  gap: 2px;
-  margin-top: 12px;
+/* ═══════════ WELCOME ═══════════ */
+.welcome-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px 60px;
+  max-width: 520px;
+  margin: 0 auto;
 }
 
-.nav-btn {
-  padding: 8px 24px;
-  border: none;
-  border-radius: 7px;
-  background: transparent;
+.welcome-hero {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.welcome-icon {
+  margin-bottom: 20px;
+}
+
+.welcome-title {
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin-bottom: 10px;
+}
+
+.welcome-desc {
+  font-size: 0.95rem;
   color: var(--text-secondary);
-  font-family: var(--font-body);
-  font-size: 0.85rem;
-  font-weight: 500;
+  line-height: 1.6;
+  max-width: 380px;
+  margin: 0 auto;
+}
+
+.welcome-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.welcome-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: 14px;
   cursor: pointer;
   transition: all 0.2s;
 }
 
-.nav-btn:hover { color: var(--text); background: rgba(255,255,255,0.05); }
-.nav-btn.active { background: var(--primary); color: white; font-weight: 600; }
+.welcome-card:hover {
+  background: var(--surface-hover);
+  border-color: rgba(255,255,255,0.15);
+  transform: translateY(-1px);
+}
+
+.welcome-card:active {
+  transform: scale(0.98);
+}
+
+.welcome-card-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+  width: 48px;
+  text-align: center;
+}
+
+.welcome-card-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.welcome-card-body h3 {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.welcome-card-body p {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.welcome-card-arrow {
+  font-size: 1.2rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  transition: transform 0.2s;
+}
+
+.welcome-card:hover .welcome-card-arrow {
+  transform: translateX(4px);
+  color: var(--text);
+}
+
+.welcome-footer {
+  margin-top: 28px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
 
 /* ── Views ── */
 .view { display: none; }
