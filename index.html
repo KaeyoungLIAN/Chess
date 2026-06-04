@@ -10,13 +10,14 @@
   <div id="app">
     <header class="app-header">
       <h1>Chess Trainer</h1>
+      <p class="subtitle">国际象棋自学平台</p>
       <nav class="nav-tabs">
         <button class="nav-btn active" data-view="ai-play">AI 对战</button>
         <button class="nav-btn" data-view="analysis">复盘分析</button>
       </nav>
     </header>
     <main id="main-content">
-      <!-- AI对战视图 -->
+      <!-- AI 对战视图 -->
       <div id="view-ai-play" class="view active">
         <div class="game-layout">
           <div class="board-section">
@@ -74,7 +75,7 @@
                 <button id="btn-next" class="btn btn-sm" title="下一步">▶</button>
                 <button id="btn-last" class="btn btn-sm" title="最后一步">⏭</button>
               </div>
-              <button id="btn-engine-eval" class="btn btn-primary">引擎分析此步</button>
+              <button id="btn-engine-eval" class="btn btn-primary" style="margin-top:10px;width:100%;">引擎分析此步</button>
             </div>
             <div class="panel-section move-history">
               <h3>棋谱</h3>

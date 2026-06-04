@@ -90,8 +90,8 @@ export class ChessBoard {
       const piece = chess.get(sq as Square);
       if (piece) {
         const span = document.createElement('span');
-        span.className = 'piece';
-        span.textContent = this.pieceChars[piece.color + piece.type] || piece.type;
+        span.className = `piece ${piece.color === 'w' ? 'white-piece' : 'black-piece'}`;
+        span.textContent = this.pieceChars[piece.color + piece.type.toUpperCase()] || piece.type;
         span.draggable = false;
         squareEl.appendChild(span);
       }

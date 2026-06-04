@@ -1,104 +1,186 @@
+/* ======================================================
+   Chess Trainer — Design System
+   Style: Minimal Swiss + Tech Startup
+   Palette: Indigo (#4F46E5) + Orange Accent (#EA580C)
+   Font: Space Grotesk (headings) + Inter (body)
+   ====================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ── Tokens ── */
 :root {
-  --bg: #f5f5f0;
-  --surface: #ffffff;
-  --primary: #4a6fa5;
-  --primary-hover: #3d5f8a;
-  --text: #2c2c2c;
-  --text-secondary: #666;
-  --border: #ddd;
-  --success: #2e7d32;
-  --danger: #c62828;
-  --warning: #f57f17;
-  --light-square: #f0d9b5;
-  --dark-square: #b58863;
-  --highlight: rgba(255, 255, 0, 0.4);
-  --last-move: rgba(155, 199, 0, 0.4);
-  --best-move: #4caf50;
-  --mistake: #f44336;
+  /* Core Palette */
+  --primary: #4F46E5;
+  --primary-hover: #4338CA;
+  --primary-light: #EEF2FF;
+  --accent: #EA580C;
+  --accent-hover: #D4530A;
+
+  /* Surfaces */
+  --bg: #0F172A;
+  --bg-secondary: #1E293B;
+  --surface: #1E293B;
+  --surface-hover: #334155;
+  --surface-border: rgba(255,255,255,0.08);
+  --overlay: rgba(15,23,42,0.92);
+
+  /* Text */
+  --text: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+
+  /* Feedback */
+  --success: #22C55E;
+  --danger: #EF4444;
+  --warning: #F59E0B;
+  --info: #3B82F6;
+
+  /* Chess Board */
+  --light-square: #E8D0A8;
+  --dark-square: #B58863;
+  --selected-square: rgba(79,70,229,0.4);
+  --legal-dot: rgba(79,70,229,0.5);
+  --legal-capture-border: rgba(79,70,229,0.6);
+  --last-move-bg: rgba(34,197,94,0.25);
+
+  /* Layout */
+  --radius: 10px;
+  --radius-sm: 6px;
+  --shadow: 0 4px 12px rgba(0,0,0,0.2);
+  --shadow-lg: 0 8px 30px rgba(0,0,0,0.3);
+
+  /* Typography */
+  --font-heading: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
+/* ── Reset ── */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-body);
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
+  line-height: 1.5;
 }
 
+::selection {
+  background: rgba(79,70,229,0.3);
+  color: var(--text);
+}
+
+/* ── App Shell ── */
 #app {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 16px;
+  padding: 0 20px;
 }
 
-/* Header */
+/* ── Header ── */
 .app-header {
   text-align: center;
-  margin-bottom: 20px;
-}
-.app-header h1 {
-  font-size: 1.6rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  margin-bottom: 8px;
+  padding: 28px 0 20px;
 }
 
-/* Navigation Tabs */
+.app-header h1 {
+  font-family: var(--font-heading);
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, #fff 0%, #94A3B8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 2px;
+}
+
+.app-header .subtitle {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 400;
+  letter-spacing: 0.05em;
+}
+
+/* ── Navigation Tabs ── */
 .nav-tabs {
-  display: flex;
-  justify-content: center;
-  gap: 0;
-  margin-bottom: 0;
+  display: inline-flex;
+  background: var(--bg-secondary);
+  border-radius: var(--radius);
+  padding: 3px;
+  gap: 2px;
+  margin-top: 14px;
 }
+
 .nav-btn {
-  padding: 10px 28px;
-  border: 1px solid var(--border);
-  background: var(--surface);
+  padding: 8px 24px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 500;
   cursor: pointer;
-  font-size: 0.95rem;
-  transition: all 0.15s;
+  transition: all 0.2s;
 }
-.nav-btn:first-child { border-radius: 8px 0 0 8px; }
-.nav-btn:last-child { border-radius: 0 8px 8px 0; }
+
+.nav-btn:hover {
+  color: var(--text);
+  background: rgba(255,255,255,0.05);
+}
+
 .nav-btn.active {
   background: var(--primary);
   color: white;
-  border-color: var(--primary);
+  font-weight: 600;
 }
-.nav-btn:not(.active):hover { background: #e8e8e3; }
 
-/* Views */
+/* ── Views ── */
 .view { display: none; }
 .view.active { display: block; }
 
-/* Game Layout */
+/* ── Game Layout ── */
 .game-layout {
   display: flex;
-  gap: 20px;
+  gap: 24px;
   align-items: flex-start;
+  justify-content: center;
 }
 
 .board-section {
   flex: 0 0 auto;
 }
 
-/* Chess Board Styles */
+/* ── Chess Board Container ── */
 #chess-board, #analysis-board {
   width: 480px;
   height: 480px;
   position: relative;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
 }
+
 .board-container {
   display: grid;
   grid-template-columns: repeat(8, 1fr);
   grid-template-rows: repeat(8, 1fr);
   width: 100%;
   height: 100%;
-  border: 2px solid #333;
-  border-radius: 4px;
-  overflow: hidden;
 }
+
 .square {
   display: flex;
   align-items: center;
@@ -107,119 +189,213 @@ body {
   cursor: pointer;
   position: relative;
   user-select: none;
+  transition: background 0.12s, box-shadow 0.12s;
 }
+
 .square.light { background: var(--light-square); }
 .square.dark { background: var(--dark-square); }
-.square.selected { background: #829769 !important; }
-.square.highlight { box-shadow: inset 0 0 0 3px var(--highlight); }
-.square.last-move { box-shadow: inset 0 0 0 3px var(--last-move); }
+
+.square.selected {
+  background: #829769 !important;
+}
+
+.square.highlight {
+  box-shadow: inset 0 0 0 3px rgba(255,255,0,0.4);
+}
+
+.square.last-move {
+  background: var(--last-move-bg) !important;
+}
+
 .square.legal-move::after {
   content: '';
   position: absolute;
   width: 26%;
   height: 26%;
-  background: rgba(0,0,0,0.15);
+  background: var(--legal-dot);
   border-radius: 50%;
 }
+
 .square.legal-capture {
-  box-shadow: inset 0 0 0 3px rgba(0,0,0,0.3);
+  box-shadow: inset 0 0 0 3px var(--legal-capture-border);
 }
+
 .piece {
   cursor: grab;
   line-height: 1;
   text-shadow: 0 1px 3px rgba(0,0,0,0.2);
   transition: none;
 }
+
 .piece:active { cursor: grabbing; }
+
 .square.fading { opacity: 0.5; }
 
-/* Side Panel */
+.piece.white-piece { color: #1a1a1a; }
+.piece.black-piece { color: #000; }
+
+/* ── Side Panel ── */
 .side-panel {
   flex: 1;
   min-width: 280px;
   max-width: 340px;
 }
+
 .panel-section {
   background: var(--surface);
-  border-radius: 8px;
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius);
   padding: 16px;
   margin-bottom: 12px;
-  border: 1px solid var(--border);
-}
-.panel-section h3 {
-  font-size: 0.9rem;
-  font-weight: 600;
-  margin-bottom: 10px;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
 
-/* Buttons */
-.btn {
-  padding: 8px 16px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: all 0.12s;
-  background: var(--surface);
+.panel-section h3 {
+  font-family: var(--font-heading);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 12px;
 }
+
+/* ── Buttons ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.15s;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.btn:hover {
+  background: var(--surface-hover);
+  border-color: rgba(255,255,255,0.15);
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
 .btn-primary {
   background: var(--primary);
   color: white;
   border-color: var(--primary);
 }
-.btn-primary:hover { background: var(--primary-hover); }
-.btn-secondary { background: var(--surface); }
-.btn-secondary:hover { background: #e8e8e3; }
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+
+.btn-secondary {
+  background: transparent;
+  border-color: var(--surface-border);
+}
+
+.btn-secondary:hover {
+  background: rgba(255,255,255,0.06);
+}
+
 .btn-sm {
   padding: 6px 12px;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
 }
-.btn-group { display: flex; gap: 4px; }
+
+.btn-group {
+  display: flex;
+  gap: 4px;
+}
+
 .btn-group .btn.active {
   background: var(--primary);
   color: white;
   border-color: var(--primary);
 }
 
-/* Difficulty Selector */
-.difficulty-selector { margin-bottom: 12px; }
+/* ── Difficulty Selector ── */
+.difficulty-selector {
+  margin-bottom: 14px;
+}
+
 .difficulty-selector label {
   display: block;
-  font-size: 0.85rem;
-  margin-bottom: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
   color: var(--text-secondary);
+  margin-bottom: 8px;
 }
+
 .difficulty-slider-container {
   display: flex;
   align-items: center;
   gap: 10px;
 }
+
 .difficulty-slider-container input[type="range"] {
   flex: 1;
-  accent-color: var(--primary);
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--surface-hover);
+  border-radius: 2px;
+  outline: none;
+}
+
+.difficulty-slider-container input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
+  border: 2px solid var(--bg);
+  box-shadow: 0 0 0 1px var(--surface-border);
+}
+
+.difficulty-slider-container input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
+  border: 2px solid var(--bg);
 }
 
 .badge {
-  display: inline-block;
-  padding: 2px 10px;
-  border-radius: 12px;
-  font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-family: var(--font-heading);
+  font-size: 0.75rem;
   font-weight: 600;
 }
+
 .badge-level {
   background: var(--primary);
   color: white;
 }
 
-.color-selector { margin-bottom: 12px; }
+.color-selector {
+  margin-bottom: 14px;
+}
+
 .color-selector label {
   display: block;
-  font-size: 0.85rem;
-  margin-bottom: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
   color: var(--text-secondary);
+  margin-bottom: 8px;
 }
 
 .game-controls .btn {
@@ -227,35 +403,61 @@ body {
   margin-bottom: 4px;
 }
 
-/* Move List */
+/* ── Move List ── */
 .move-list {
-  max-height: 300px;
+  max-height: 280px;
   overflow-y: auto;
-  font-family: 'SF Mono', 'Fira Code', monospace;
-  font-size: 0.85rem;
-  line-height: 1.7;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  line-height: 1.8;
 }
+
+.move-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.move-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.move-list::-webkit-scrollbar-thumb {
+  background: var(--surface-hover);
+  border-radius: 2px;
+}
+
 .move-entry {
   display: flex;
-  padding: 2px 4px;
+  padding: 1px 6px;
   border-radius: 4px;
 }
-.move-entry:hover { background: #f0f0eb; }
-.move-entry.current { background: #e3e8f0; }
+
+.move-entry:hover {
+  background: rgba(255,255,255,0.04);
+}
+
+.move-entry.current {
+  background: rgba(255,255,255,0.06);
+}
+
 .move-number {
   width: 28px;
-  color: var(--text-secondary);
+  color: var(--text-muted);
   text-align: right;
   margin-right: 8px;
   flex-shrink: 0;
 }
+
 .move-white, .move-black {
   width: 70px;
   cursor: pointer;
   padding: 0 4px;
   border-radius: 3px;
 }
-.move-white:hover, .move-black:hover { background: #dde; }
+
+.move-white:hover, .move-black:hover {
+  background: rgba(255,255,255,0.06);
+}
+
 .move-entry.current .move-white.current,
 .move-entry.current .move-black.current {
   background: var(--primary);
@@ -263,93 +465,171 @@ body {
   border-radius: 3px;
 }
 
-/* Game Status */
+/* ── Game Status ── */
 .game-status {
   text-align: center;
-  font-size: 1.05rem;
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
   font-weight: 600;
+  letter-spacing: -0.01em;
 }
+
 .game-status .win { color: var(--success); }
 .game-status .lose { color: var(--danger); }
 .game-status .draw { color: var(--warning); }
 
-/* Analysis Controls */
+/* ── Analysis Controls ── */
 .nav-controls {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   justify-content: center;
 }
-.nav-controls #move-counter {
-  font-size: 0.85rem;
+
+.nav-controls .btn {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  font-size: 0.9rem;
+  border-radius: var(--radius-sm);
+}
+
+#move-counter {
+  font-size: 0.8rem;
+  font-family: var(--font-mono);
   color: var(--text-secondary);
-  min-width: 60px;
+  min-width: 70px;
   text-align: center;
 }
 
-/* Engine Output */
+/* ── Engine Output ── */
 .engine-output {
-  margin-top: 10px;
+  margin-top: 12px;
   font-size: 0.8rem;
-  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-family: var(--font-mono);
   line-height: 1.6;
 }
+
 .eval-bar {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 6px;
-  background: #f0f0eb;
-  border-radius: 4px;
+  padding: 8px 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-sm);
   margin-bottom: 8px;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 600;
 }
-.eval-positive { color: var(--text); }
+
+.eval-positive { color: var(--success); }
 .eval-negative { color: var(--danger); }
 .eval-best { color: var(--success); }
 .eval-mistake { color: var(--danger); }
 
-/* PGN Input */
+/* ── PGN Input ── */
 #pgn-input {
   width: 100%;
   resize: vertical;
-  padding: 8px;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  font-family: 'SF Mono', monospace;
-  font-size: 0.8rem;
-  margin-bottom: 8px;
+  padding: 10px;
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  line-height: 1.5;
+  margin-bottom: 10px;
+  outline: none;
+  transition: border-color 0.15s;
 }
 
-/* Loading Overlay */
+#pgn-input:focus {
+  border-color: var(--primary);
+}
+
+#pgn-input::placeholder {
+  color: var(--text-muted);
+}
+
+/* ── Loading Overlay ── */
 .loading-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(255,255,255,0.85);
+  background: var(--overlay);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
+
 .loading-overlay.hidden { display: none; }
+
 .loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid var(--border);
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(255,255,255,0.1);
   border-top-color: var(--primary);
   border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  margin-bottom: 12px;
+  animation: spin 0.7s linear infinite;
+  margin-bottom: 14px;
 }
+
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* Responsive */
+.loading-overlay p {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+/* ── Responsive ── */
 @media (max-width: 860px) {
-  .game-layout { flex-direction: column; align-items: center; }
-  #chess-board, #analysis-board { width: 360px; height: 360px; }
-  .square { font-size: 2rem; }
-  .side-panel { max-width: 100%; width: 100%; }
+  .game-layout {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #chess-board, #analysis-board {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    aspect-ratio: 1 / 1;
+  }
+
+  .square {
+    font-size: 2rem;
+  }
+
+  .side-panel {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .app-header h1 {
+    font-size: 1.4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  #app {
+    padding: 0 12px;
+  }
+
+  #chess-board, #analysis-board {
+    max-width: 100%;
+  }
+
+  .square {
+    font-size: 1.5rem;
+  }
+
+  .panel-section {
+    padding: 12px;
+  }
 }
