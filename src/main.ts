@@ -43,13 +43,16 @@ async function init() {
   document.getElementById('welcome-tutorial')?.addEventListener('click', () => navigateTo('tutorial'));
   document.getElementById('welcome-puzzle')?.addEventListener('click', () => navigateTo('puzzle'));
 
-  // 返回首页按钮
-  document.querySelectorAll('.back-to-home').forEach(btn => {
+  // 返回首页按钮（统一 class back-home-btn）
+  document.querySelectorAll('.back-home-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      // 如果 AI 对战视图开着，模拟点击"返回设置"
-      const backToSetup = document.getElementById('btn-back-to-setup');
-      if (backToSetup && !backToSetup.closest('.hidden')) {
-        backToSetup.click();
+      // 如果 AI 对战视图开着且不在配置面板，先回配置
+      const viewAiPlay = document.getElementById('view-ai-play');
+      if (viewAiPlay && viewAiPlay.classList.contains('active')) {
+        const setupPanel = document.getElementById('panel-setup');
+        if (setupPanel && setupPanel.classList.contains('hidden')) {
+          document.getElementById('btn-back-to-setup')?.click();
+        }
       }
       navigateTo('welcome');
     });

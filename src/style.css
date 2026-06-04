@@ -63,6 +63,33 @@ body {
 
 .hidden { display: none !important; }
 
+/* ── 顶部返回按钮 ── */
+.back-home-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 14px;
+  margin-bottom: 8px;
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.back-home-btn:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+  border-color: rgba(255,255,255,0.15);
+}
+
+.back-home-btn:active {
+  transform: scale(0.97);
+}
+
 /* ── App ── */
 #app { max-width: 1280px; margin: 0 auto; padding: 0 20px; }
 

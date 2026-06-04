@@ -66,6 +66,7 @@
 
     <!-- ═══════════ AI 对战视图 ═══════════ -->
     <div id="view-ai-play" class="view">
+      <button class="back-home-btn" data-target="ai-play">← 返回</button>
       <div class="game-layout">
         <div class="board-section">
           <div id="chess-board"></div>
@@ -111,13 +112,13 @@
             <span id="status-text">设置好难度和执棋，点击开始</span>
             <button id="btn-download-pgn" class="btn btn-ghost btn-full hidden" style="margin-top:8px;">下载 PGN</button>
           </div>
-          <button class="btn btn-ghost btn-full back-to-home" data-target="ai-play">← 返回首页</button>
         </div>
       </div>
     </div>
 
     <!-- ═══════════ 复盘分析视图 ═══════════ -->
     <div id="view-analysis" class="view">
+      <button class="back-home-btn" data-target="analysis">← 返回</button>
       <div class="game-layout">
         <div class="board-section">
           <div id="analysis-board"></div>
@@ -154,28 +155,27 @@
             <h3>棋谱</h3>
             <div id="analysis-move-list" class="move-list"></div>
           </div>
-          <button class="btn btn-ghost btn-full back-to-home" data-target="analysis">← 返回首页</button>
         </div>
       </div>
     </div>
 
     <!-- ═══════════ 教学课程视图 ═══════════ -->
     <div id="view-tutorial" class="view">
+      <button class="back-home-btn" data-target="tutorial">← 返回</button>
       <div class="placeholder-view">
         <div class="placeholder-icon">📖</div>
         <h2 class="placeholder-title">教学课程</h2>
         <p class="placeholder-desc">即将上线，敬请期待</p>
-        <button class="btn btn-primary" onclick="document.getElementById('view-tutorial').classList.remove('active');document.getElementById('view-welcome').classList.add('active')">返回首页</button>
       </div>
     </div>
 
     <!-- ═══════════ 残局挑战视图 ═══════════ -->
     <div id="view-puzzle" class="view">
+      <button class="back-home-btn" data-target="puzzle">← 返回</button>
       <div class="placeholder-view">
         <div class="placeholder-icon">🧩</div>
         <h2 class="placeholder-title">残局挑战</h2>
         <p class="placeholder-desc">即将上线，敬请期待</p>
-        <button class="btn btn-primary" onclick="document.getElementById('view-puzzle').classList.remove('active');document.getElementById('view-welcome').classList.add('active')">返回首页</button>
       </div>
     </div>
 
