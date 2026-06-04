@@ -36,7 +36,7 @@
   --selected-square: rgba(79,70,229,0.4);
   --legal-dot: rgba(79,70,229,0.5);
   --legal-capture-border: rgba(79,70,229,0.6);
-  --last-move-bg: rgba(34,197,94,0.25);
+  --last-move-bg: rgba(0,0,0,0.12);
 
   --radius: 10px;
   --radius-sm: 6px;
@@ -161,8 +161,8 @@ body {
 
 /* ── Chess Board Container ── */
 #chess-board, #analysis-board {
-  width: 480px;
-  height: 480px;
+  width: 560px;
+  height: 560px;
   position: relative;
   border-radius: var(--radius);
   overflow: hidden;
@@ -181,11 +181,16 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.8rem;
   cursor: pointer;
   position: relative;
   user-select: none;
   transition: background 0.12s, box-shadow 0.12s;
+}
+
+.square svg {
+  display: block;
+  width: 85%;
+  height: 85%;
 }
 
 .square.light { background: var(--light-square); }
@@ -215,6 +220,9 @@ body {
 .square.legal-capture {
   box-shadow: inset 0 0 0 3px var(--legal-capture-border);
 }
+
+/* 棋子 SVG 可点击区域覆盖 */
+.square svg { pointer-events: none; }
 
 .piece {
   cursor: grab;
@@ -641,13 +649,9 @@ body {
 
   #chess-board, #analysis-board {
     width: 100%;
-    max-width: 400px;
+    max-width: 440px;
     height: auto;
     aspect-ratio: 1 / 1;
-  }
-
-  .square {
-    font-size: 2rem;
   }
 
   .side-panel {
@@ -667,10 +671,6 @@ body {
 
   #chess-board, #analysis-board {
     max-width: 100%;
-  }
-
-  .square {
-    font-size: 1.5rem;
   }
 
   .panel-section {
