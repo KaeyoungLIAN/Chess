@@ -35,6 +35,7 @@ export class AIPlayManager {
   private gameInfoTurn: HTMLElement;
   private btnUndo: HTMLButtonElement;
   private btnStart: HTMLButtonElement;
+  private btnDownloadPgn: HTMLButtonElement;
 
   constructor() {
     this.chess = new Chess();
@@ -55,6 +56,7 @@ export class AIPlayManager {
     this.gameInfoTurn = document.getElementById('game-info-turn')!;
     this.btnUndo = document.getElementById('btn-undo') as HTMLButtonElement;
     this.btnStart = document.getElementById('btn-start-game') as HTMLButtonElement;
+    this.btnDownloadPgn = document.getElementById('btn-download-pgn') as HTMLButtonElement;
 
     this.bindControls();
     this.showSetupPanel();
@@ -108,6 +110,11 @@ export class AIPlayManager {
       this.showGameOverState();
     });
 
+    // 下载 PGN
+    this.btnDownloadPgn.addEventListener('click', () => {
+      this.downloadPgn();
+    });
+
     // 返回设置
     document.getElementById('btn-back-to-setup')?.addEventListener('click', () => {
       if (this.phase === 'ai_thinking') return;
@@ -119,6 +126,7 @@ export class AIPlayManager {
   private showSetupPanel() {
     this.panelSetup.classList.remove('hidden');
     this.panelGame.classList.add('hidden');
+    this.btnDownloadPgn.classList.add('hidden');
     this.updateStatus('设置好难度和执棋，点击开始');
     this.difficultySlider.disabled = false;
   }
@@ -131,7 +139,7 @@ export class AIPlayManager {
 
   private showGameOverState() {
     this.btnUndo.disabled = true;
-    // 棋盘只读
+    this.btnDownloadPgn.classList.remove('hidden');
   }
 
   setPlayerColor(color: PlayerColor) {
@@ -370,6 +378,7 @@ export class AIPlayManager {
     this.board.clearLastMove();
     this.board.clearHighlights();
     this.phase = 'setup';
+    this.btnDownloadPgn.classList.add('hidden');
     this.render();
   }
 
@@ -389,5 +398,17 @@ export class AIPlayManager {
 
   private updateStatusWithClass(msg: string, className: string) {
     this.statusEl.innerHTML = `<span class="${className}">${msg}</span>`;
+  }
+
+  private downloadPgn() {
+    const pgn = this.chess.pgn();
+    if (!pgn) return;
+    const blob = new Blob([pgn], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `chess-game-${new Date().toISOString().slice(0, 19).replace(/[:-]/g, '')}.pgn`;
+    a.click();
+    URL.revokeObjectURL(url);
   }
 }
