@@ -140,6 +140,43 @@ body {
   box-shadow: var(--shadow-lg);
 }
 
+/* ── 评估柱 (复盘用) ── */
+#eval-bar-container {
+  width: 560px;
+  margin-top: 8px;
+  padding: 0;
+}
+
+#eval-bar-track {
+  position: relative;
+  width: 100%;
+  height: 24px;
+  background: var(--dark-square);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+#eval-bar-fill {
+  height: 100%;
+  width: 50%;
+  background: var(--light-square);
+  transition: width 0.3s ease;
+}
+
+#eval-bar-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #000;
+  line-height: 24px;
+  text-shadow: 0 0 4px rgba(255,255,255,0.6);
+}
+
 .board-container {
   display: grid;
   grid-template-columns: repeat(8, 1fr);
@@ -375,6 +412,54 @@ body {
 }
 .move-white:hover, .move-black:hover { background: rgba(255,255,255,0.06); }
 
+/* 棋谱评估标注 */
+.move-eval {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-left: 4px;
+  min-width: 36px;
+  text-align: left;
+}
+
+/* ── 分析详情 ── */
+.analysis-best-line {
+  font-size: 0.8rem;
+  margin-bottom: 8px;
+  padding: 8px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  line-height: 1.6;
+}
+
+.eval-best-label { color: var(--success); font-weight: 600; }
+.eval-mono { font-family: var(--font-mono); font-size: 0.78rem; }
+.eval-score { color: var(--text-secondary); margin-left: 6px; font-family: var(--font-mono); }
+.eval-depth { color: var(--text-muted); margin-left: 6px; font-size: 0.7rem; }
+.eval-pending { color: var(--text-muted); font-style: italic; }
+
+.analysis-multi-pv {
+  margin-bottom: 4px;
+}
+
+.pv-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 6px;
+  font-size: 0.75rem;
+  border-radius: 3px;
+}
+.pv-row:hover { background: rgba(255,255,255,0.04); }
+.pv-rank { color: var(--text-muted); font-size: 0.7rem; min-width: 14px; }
+.pv-score { color: var(--text-secondary); font-family: var(--font-mono); }
+.eval-loss { color: var(--danger); font-size: 0.7rem; margin-left: auto; }
+
+.analysis-blink {
+  margin-top: 4px;
+  font-size: 0.75rem;
+  min-height: 1.2em;
+}
+
 /* ── Game Status ── */
 .game-status {
   text-align: center;
@@ -497,6 +582,10 @@ body {
     max-width: 480px;
     height: auto;
     aspect-ratio: 1 / 1;
+  }
+  #eval-bar-container {
+    width: 100%;
+    max-width: 480px;
   }
 
   .side-panel { max-width: 100%; width: 100%; }

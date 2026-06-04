@@ -24,7 +24,6 @@
             <div id="chess-board"></div>
           </div>
           <div class="side-panel">
-            <!-- 配置面板：仅开局前可见 -->
             <div id="panel-setup" class="panel-section">
               <h3>对局设置</h3>
               <div class="difficulty-selector">
@@ -44,7 +43,6 @@
               </div>
               <button id="btn-start-game" class="btn btn-primary btn-full">开始对局</button>
             </div>
-            <!-- 对局控制面板：开局后可见 -->
             <div id="panel-game" class="panel-section hidden">
               <h3>对局控制</h3>
               <div class="game-info-row">
@@ -58,7 +56,6 @@
               </div>
               <button id="btn-back-to-setup" class="btn btn-ghost btn-full">返回设置</button>
             </div>
-            <!-- 棋谱面板：始终可见（记录区和状态合并） -->
             <div class="panel-section move-history">
               <h3>走棋记录</h3>
               <div id="move-list" class="move-list"></div>
@@ -75,14 +72,23 @@
         <div class="game-layout">
           <div class="board-section">
             <div id="analysis-board"></div>
+            <!-- 评估柱 -->
+            <div id="eval-bar-container">
+              <div id="eval-bar-track">
+                <div id="eval-bar-fill"></div>
+                <span id="eval-bar-label">0.00</span>
+              </div>
+            </div>
           </div>
           <div class="side-panel">
+            <!-- 导入区 -->
             <div class="panel-section">
               <h3>导入棋局</h3>
-              <textarea id="pgn-input" placeholder="粘贴 PGN 格式棋局..." rows="8"></textarea>
-              <button id="btn-load-pgn" class="btn btn-primary">加载复盘</button>
+              <textarea id="pgn-input" placeholder="粘贴 PGN 格式棋局..." rows="5"></textarea>
+              <button id="btn-load-pgn" class="btn btn-primary btn-full">加载复盘并分析</button>
             </div>
-            <div class="panel-section analysis-controls">
+            <!-- 导航 + 详情 -->
+            <div id="analysis-nav-section" class="panel-section hidden">
               <h3>复盘控制</h3>
               <div class="nav-controls">
                 <button id="btn-first" class="btn btn-sm" title="第一步">⏮</button>
@@ -91,12 +97,18 @@
                 <button id="btn-next" class="btn btn-sm" title="下一步">▶</button>
                 <button id="btn-last" class="btn btn-sm" title="最后一步">⏭</button>
               </div>
-              <button id="btn-engine-eval" class="btn btn-primary btn-full" style="margin-top:10px;">引擎分析此步</button>
             </div>
-            <div class="panel-section move-history">
+            <!-- 引擎分析详情 -->
+            <div id="analysis-detail" class="panel-section hidden">
+              <h3>引擎分析</h3>
+              <div id="analysis-best-line" class="analysis-best-line"></div>
+              <div id="analysis-multi-pv" class="analysis-multi-pv"></div>
+              <div id="analysis-blink" class="analysis-blink"></div>
+            </div>
+            <!-- 棋谱 + 每步评估 -->
+            <div class="panel-section move-history" style="flex:1;">
               <h3>棋谱</h3>
               <div id="analysis-move-list" class="move-list"></div>
-              <div id="analysis-engine-output" class="engine-output"></div>
             </div>
           </div>
         </div>

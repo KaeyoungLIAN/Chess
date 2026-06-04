@@ -1,254 +1,324 @@
 /**
  * 复盘分析模式
- * 导入 .pgn 棋局，逐步行进，引擎分析
+ * 加载 PGN 后自动逐路引擎分析，每步显示评估值和最佳走法
  */
 
 import { Chess, type Square, type Move } from 'chess.js';
 import { ChessBoard } from './board';
 import { getEngine } from './engine';
 import { renderAnalysisMoveHistory } from './moveHistory';
-import type { EvalResult } from './engine';
 
-type AnalysisPhase = 'idle' | 'loaded' | 'analyzing' | 'done';
+export interface EvalResult {
+  move: string;
+  score: number | null;
+  mate: number | null;
+  depth: number;
+  multipv: number;
+}
+
+/** 缓存中单步的分析结果 */
+interface StepEval {
+  best: string;           // 最佳走法 UCI
+  cp: number | null;      // 局面评估 (centipawn)
+  mate: number | null;    // 将杀
+  depth: number;
+  moves: { move: string; cp: number | null; mate: number | null }[]; // top3
+}
 
 export class AnalysisManager {
   private chess: Chess;
   private board: ChessBoard;
   private moves: Move[] = [];
-  private currentIndex: number = -1; // -1 = 初始局面
-  private phase: AnalysisPhase = 'idle';
-  
+  private currentIndex: number = -1;
+
   // DOM
   private pgnInput: HTMLTextAreaElement;
   private moveListEl: HTMLElement;
   private moveCounterEl: HTMLElement;
-  private engineOutputEl: HTMLElement;
-  
+  private bestLineEl: HTMLElement;
+  private multiPvEl: HTMLElement;
+  private blinkEl: HTMLElement;
+  private evalBarFill: HTMLElement;
+  private evalBarLabel: HTMLElement;
+  private navSection: HTMLElement;
+  private detailSection: HTMLElement;
+
+  // 分析缓存: 第 N 步后的评估
+  private evals: (StepEval | null)[] = [];
+  private analyzing: boolean = false;
+  private queuedIndex: number | null = null;
+
   constructor() {
     this.chess = new Chess();
-    
+
     this.board = new ChessBoard({
       id: 'analysis-board',
       orientation: 'white',
-      onSquareClick: () => {}, // 复盘模式只读，不点击走棋
+      onSquareClick: () => {},
     });
-    
+
     this.pgnInput = document.getElementById('pgn-input') as HTMLTextAreaElement;
     this.moveListEl = document.getElementById('analysis-move-list')!;
     this.moveCounterEl = document.getElementById('move-counter')!;
-    this.engineOutputEl = document.getElementById('analysis-engine-output')!;
-    
+    this.bestLineEl = document.getElementById('analysis-best-line')!;
+    this.multiPvEl = document.getElementById('analysis-multi-pv')!;
+    this.blinkEl = document.getElementById('analysis-blink')!;
+    this.evalBarFill = document.getElementById('eval-bar-fill')!;
+    this.evalBarLabel = document.getElementById('eval-bar-label')!;
+    this.navSection = document.getElementById('analysis-nav-section')!;
+    this.detailSection = document.getElementById('analysis-detail')!;
+
     this.bindControls();
-    this.render();
+    this.board.renderEmpty();
   }
 
   private bindControls() {
-    // 导入 PGN
-    document.getElementById('btn-load-pgn')?.addEventListener('click', () => {
-      this.loadPGN();
-    });
+    document.getElementById('btn-load-pgn')?.addEventListener('click', () => this.loadPGN());
 
-    // 空棋盘示例
-    (document.querySelector('#pgn-input + .btn-secondary') as HTMLElement)?.addEventListener('click', () => {
-      this.pgnInput.value = EXAMPLE_PGN;
-      this.loadPGN();
-    });
+    document.getElementById('btn-first')?.addEventListener('click', () => this.goTo(-1));
+    document.getElementById('btn-prev')?.addEventListener('click', () => this.goTo(this.currentIndex - 1));
+    document.getElementById('btn-next')?.addEventListener('click', () => this.goTo(this.currentIndex + 1));
+    document.getElementById('btn-last')?.addEventListener('click', () => this.goTo(this.moves.length - 1));
 
-    // 导航控制
-    document.getElementById('btn-first')?.addEventListener('click', () => this.goToMove(-1));
-    document.getElementById('btn-prev')?.addEventListener('click', () => this.goToMove(this.currentIndex - 1));
-    document.getElementById('btn-next')?.addEventListener('click', () => this.goToMove(this.currentIndex + 1));
-    document.getElementById('btn-last')?.addEventListener('click', () => this.goToMove(this.moves.length - 1));
-    
-    // 键盘快捷键
     document.addEventListener('keydown', (e) => {
-      if (this.phase === 'idle') return;
+      if (this.moves.length === 0) return;
       if (e.key === 'ArrowRight' || e.key === ' ') {
         e.preventDefault();
-        this.goToMove(this.currentIndex + 1);
+        this.goTo(this.currentIndex + 1);
       } else if (e.key === 'ArrowLeft') {
         e.preventDefault();
-        this.goToMove(this.currentIndex - 1);
+        this.goTo(this.currentIndex - 1);
       }
     });
-
-    // 引擎分析
-    document.getElementById('btn-engine-eval')?.addEventListener('click', () => {
-      this.analyzeCurrentPosition();
-    });
   }
+
+  // ══════════════ 加载 PGN ══════════════
 
   private loadPGN() {
     const pgn = this.pgnInput.value.trim();
-    if (!pgn) {
-      this.showEngineOutput('<div style="color:var(--danger);">请输入 PGN 棋局</div>');
-      return;
-    }
+    if (!pgn) return;
 
     try {
-      const tempChess = new Chess();
-      tempChess.loadPgn(pgn);
-      this.moves = tempChess.history({ verbose: true });
-      
+      const temp = new Chess();
+      temp.loadPgn(pgn);
+      this.moves = temp.history({ verbose: true });
       if (this.moves.length === 0) {
-        this.showEngineOutput('<div style="color:var(--danger);">PGN 解析成功但没有走棋记录</div>');
+        this.showBlink('PGN 解析成功但没有走棋记录', 'warn');
         return;
       }
-      
+
       // 重置
       this.chess = new Chess();
       this.currentIndex = -1;
-      this.phase = 'loaded';
-      
+      this.evals = [];
+      this.board.clearHighlights();
+      this.board.renderEmpty();
       this.render();
-      this.showEngineOutput(`<div style="color:var(--success);">已加载 ${this.moves.length} 步棋</div>`);
-      this.updateMoveCounter();
+
+      this.navSection.classList.remove('hidden');
+      this.detailSection.classList.remove('hidden');
+      this.updateNavCounter();
       this.renderMoveList();
-      
+      this.showBlink(`已加载 ${this.moves.length} 步，正在分析...`, 'info');
+
+      // 开始后台逐步分析
+      this.analyzeAllMoves();
+
     } catch (e) {
-      this.showEngineOutput(`<div style="color:var(--danger);">PGN 解析失败: ${(e as Error).message}</div>`);
+      this.showBlink(`PGN 解析失败: ${(e as Error).message}`, 'error');
     }
   }
 
-  private goToMove(targetIndex: number) {
-    if (this.phase === 'analyzing') return;
-    
-    // 限制范围
-    targetIndex = Math.max(-1, Math.min(this.moves.length - 1, targetIndex));
-    if (targetIndex === this.currentIndex) return;
-    
-    this.currentIndex = targetIndex;
-    
-    // 从初始局面开始重放
-    this.chess = new Chess();
-    for (let i = 0; i <= this.currentIndex; i++) {
-      try {
-        this.chess.move(this.moves[i].san);
-      } catch {
-        break;
-      }
-    }
-    
-    this.board.clearHighlights();
-    this.render();
-    this.updateMoveCounter();
-    this.renderMoveList();
-    this.engineOutputEl.innerHTML = '';
-  }
+  // ══════════════ 引擎分析 ══════════════
 
-  private async analyzeCurrentPosition() {
+  private async analyzeAllMoves() {
     const engine = getEngine();
     if (!engine.isReady()) {
-      this.showEngineOutput('<div style="color:var(--warning);">引擎未就绪，请稍后重试</div>');
-      return;
-    }
-    
-    if (this.chess.isGameOver()) {
-      this.showEngineOutput('<div style="color:var(--text-secondary);">对局已结束，无法分析</div>');
+      this.showBlink('引擎未就绪', 'warn');
       return;
     }
 
-    this.phase = 'analyzing';
-    this.showEngineOutput('<div class="loading-spinner" style="width:20px;height:20px;border-width:2px;margin:0 auto 8px;"></div><div style="text-align:center;color:var(--text-secondary);">引擎分析中...</div>');
+    this.analyzing = true;
+    const total = this.moves.length;
 
-    try {
-      const fen = this.chess.fen();
-      const moves = this.chess.history({ verbose: false });
-      
-      if (moves.length > 0) {
-        engine.setStartPosition(moves);
-      } else {
-        engine.setStartPosition();
+    // 逐步分析: 对第 N 步后的局面进行评估
+    for (let i = 0; i <= total; i++) {
+      if (!this.analyzing) break; // 可能被新加载中断
+
+      if (this.evals[i] !== undefined) continue; // 已分析过
+
+      const working = new Chess();
+      for (let j = 0; j < i; j++) {
+        working.move(this.moves[j].san);
       }
-      
-      const evals = await engine.analyzePosition(10, 2000);
-      
-      if (evals.length > 0) {
-        // 取第一个评估
-        const mainEval = evals[0];
-        const isWhiteTurn = this.chess.turn() === 'w';
-        const scoreCP = mainEval.score !== null ? (isWhiteTurn ? mainEval.score : -mainEval.score) : null;
-        
-        // 评估显示
-        let evalStr = '';
-        if (mainEval.mate !== null) {
-          const mateIn = Math.abs(mainEval.mate);
-          evalStr = `#${mateIn}`;
-        } else if (scoreCP !== null) {
-          evalStr = `${(scoreCP / 100).toFixed(2)}`;
-        }
-        
-        let html = `
-          <div class="eval-bar ${scoreCP !== null && scoreCP >= 0 ? 'eval-positive' : 'eval-negative'}">
-            局面评估: ${evalStr}
-            ${scoreCP !== null ? `<span style="font-size:0.7rem;color:var(--text-secondary);margin-left:8px;">深度 ${mainEval.depth}</span>` : ''}
-          </div>
-        `;
-        
-        // 最佳走法
-        if (mainEval.move) {
-          const from = mainEval.move.substring(0, 2);
-          const to = mainEval.move.substring(2, 4);
-          html += `<div class="eval-best">✅ 最佳走法: ${mainEval.move}</div>`;
-          
-          // 高亮最佳走法的格子
-          this.board.setHighlights([from as Square, to as Square]);
-          this.render();
-        }
-        
-        // 多走法对比（如果有）
-        if (evals.length >= 2) {
-          const currentEval = evals[0];
-          // 计算当前走法与最佳的差距
-          html += '<div style="margin-top:8px;font-weight:600;font-size:0.8rem;color:var(--text-secondary);">备选走法:</div>';
-          
-          for (let i = 0; i < Math.min(evals.length, 3); i++) {
-            const e = evals[i];
-            const eScore = this.chess.turn() === 'w' ? (e.score ?? 0) : -(e.score ?? 0);
-            const loss = currentEval.score !== null && e.score !== null 
-              ? currentEval.score - e.score 
-              : 0;
-            
-            if (e.move) {
-              html += `<div style="font-size:0.75rem;padding:2px 0;">
-                <span class="${i === 0 ? 'eval-best' : ''}">${e.move}</span>
-                <span style="color:var(--text-secondary);margin-left:6px;">
-                  ${e.mate !== null ? `#${e.mate}` : (e.score !== null ? `${(eScore / 100).toFixed(2)}` : '')}
-                  ${i > 0 && loss > 50 ? `<span class="eval-mistake"> (亏 ${(loss / 100).toFixed(2)})</span>` : ''}
-                </span>
-              </div>`;
-            }
-          }
-        }
-        
-        this.showEngineOutput(html);
-      } else {
-        this.showEngineOutput('<div style="color:var(--warning);">引擎未返回分析结果</div>');
+
+      if (working.isGameOver()) {
+        this.evals[i] = null;
+        continue;
       }
-    } catch (e) {
-      this.showEngineOutput(`<div style="color:var(--danger);">分析失败: ${(e as Error).message}</div>`);
+
+      // 发送局面给引擎
+      const history = working.history({ verbose: false });
+      engine.setStartPosition(history);
+
+      try {
+        const results = await engine.analyzePosition(10, 1000);
+        const step: StepEval = {
+          best: results[0]?.move || '',
+          cp: results[0]?.score ?? null,
+          mate: results[0]?.mate ?? null,
+          depth: results[0]?.depth || 0,
+          moves: results.slice(0, 3).map(r => ({
+            move: r.move,
+            cp: r.score,
+            mate: r.mate,
+          })),
+        };
+        this.evals[i] = step;
+      } catch {
+        this.evals[i] = null;
+      }
+
+      // 如果当前正在看这一步(或附近)，实时更新显示
+      if (this.currentIndex === i || this.currentIndex === i - 1) {
+        this.showEval(this.currentIndex);
+      }
+
+      // 更新棋谱中的评估显示
+      this.renderMoveList();
+
+      // 小延迟避免引擎过载
+      await new Promise(r => setTimeout(r, 50));
     }
-    
-    this.phase = 'loaded';
+
+    this.analyzing = false;
+    this.showBlink('分析完成', 'success');
+  }
+
+  // ══════════════ 导航 ══════════════
+
+  private goTo(targetIndex: number) {
+    targetIndex = Math.max(-1, Math.min(this.moves.length - 1, targetIndex));
+    if (targetIndex === this.currentIndex) return;
+    this.currentIndex = targetIndex;
+
+    // 重放
+    this.chess = new Chess();
+    for (let i = 0; i <= this.currentIndex; i++) {
+      try { this.chess.move(this.moves[i].san); } catch { break; }
+    }
+
+    this.board.clearHighlights();
+    this.render();
+    this.updateNavCounter();
+    this.renderMoveList();
+    this.showEval(targetIndex);
+  }
+
+  // ══════════════ 渲染评估 ══════════════
+
+  private showEval(index: number) {
+    const e = this.evals[index];
+    if (!e) {
+      this.bestLineEl.innerHTML = '<span class="eval-pending">分析中...</span>';
+      this.multiPvEl.innerHTML = '';
+      this.updateEvalBar(0, null);
+      return;
+    }
+
+    // 最佳走法
+    const turn = (index < 0 || this.chess.turn() === 'w') ? '白方' : '黑方';
+    const bestLineHtml = e.best
+      ? `<span class="eval-best-label">最佳走法:</span> <span class="eval-mono">${this.uciToDisplay(e.best)}</span>
+         <span class="eval-score">${this.formatScore(e.cp, e.mate)}</span>
+         <span class="eval-depth">深度 ${e.depth}</span>`
+      : '<span class="eval-pending">无数据</span>';
+    this.bestLineEl.innerHTML = bestLineHtml;
+
+    // Top3 备选
+    if (e.moves.length > 1) {
+      const top = e.cp !== null ? e.cp : 0;
+      this.multiPvEl.innerHTML = e.moves.slice(0, 3).map((m, i) => {
+        const loss = m.cp !== null && e.cp !== null && i > 0 ? top - m.cp : 0;
+        const lossText = loss > 30 ? `<span class="eval-loss">亏 ${(loss / 100).toFixed(2)}</span>` : '';
+        return `<div class="pv-row">
+          <span class="pv-rank">${i + 1}</span>
+          <span class="eval-mono">${this.uciToDisplay(m.move)}</span>
+          <span class="pv-score">${this.formatScore(m.cp, m.mate)}</span>
+          ${lossText}
+        </div>`;
+      }).join('');
+    } else {
+      this.multiPvEl.innerHTML = '';
+    }
+
+    // 评估柱
+    this.updateEvalBar(e.cp, e.mate);
+  }
+
+  private updateEvalBar(cp: number | null, mate: number | null) {
+    // 将杀: 满
+    let pct = 50;
+    if (mate !== null) {
+      pct = mate > 0 ? 0 : 100;
+    } else if (cp !== null) {
+      // cp -> 百分比, ±500 封顶
+      pct = 50 - Math.max(-500, Math.min(500, cp)) / 10;
+      pct = Math.max(5, Math.min(95, pct));
+    }
+
+    // pct = 白方优势百分比
+    this.evalBarFill.style.width = `${Math.max(pct, 0)}%`;
+
+    // 标签
+    let label = '0.00';
+    if (mate !== null) {
+      label = `#${Math.abs(mate)}`;
+    } else if (cp !== null) {
+      label = (cp / 100).toFixed(2);
+      if (cp > 0) label = '+' + label;
+    }
+    this.evalBarLabel.textContent = label;
+  }
+
+  // ══════════════ 辅助 ══════════════
+
+  /** UCI "e2e4" => "e4" 显示 */
+  private uciToDisplay(uci: string): string {
+    if (uci.length < 4) return uci;
+    const from = uci.substring(0, 2);
+    const to = uci.substring(2, 4);
+    const p = uci.length > 4 ? uci[4].toUpperCase() : '';
+    return `${from} → ${to}${p}`;
+  }
+
+  private formatScore(cp: number | null, mate: number | null): string {
+    if (mate !== null) return `#${Math.abs(mate)}`;
+    if (cp !== null) return (cp / 100).toFixed(2);
+    return '-';
+  }
+
+  private showBlink(msg: string, type: 'info' | 'warn' | 'error' | 'success') {
+    const colors: Record<string, string> = {
+      info: 'color:var(--text-secondary)',
+      warn: 'color:var(--warning)',
+      error: 'color:var(--danger)',
+      success: 'color:var(--success)',
+    };
+    this.blinkEl.innerHTML = `<span style="${colors[type]}">${msg}</span>`;
   }
 
   private render() {
     this.board.render(this.chess);
   }
 
-  private updateMoveCounter() {
+  private updateNavCounter() {
     this.moveCounterEl.textContent = `${this.currentIndex + 1} / ${this.moves.length}`;
   }
 
   private renderMoveList() {
     renderAnalysisMoveHistory(this.moveListEl, this.moves, this.currentIndex, (idx) => {
-      this.goToMove(idx);
-    });
-  }
-
-  private showEngineOutput(html: string) {
-    this.engineOutputEl.innerHTML = html;
+      this.goTo(idx);
+    }, this.evals);
   }
 }
-
-const EXAMPLE_PGN = `1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Na5 10. Bc2 c5 11. d4 Qc7 12. Nbd2 cxd4 13. cxd4 Nc6 14. Nb3 Nxd4 15. Nfxd4 exd4 16. Qxd4 Bd7 17. Bg5 Rfe8 18. Rae1 d5 19. e5 Bc6 20. Qd3 g6 21. Bf6 Bd6 22. Bxe8 Rxe8 23. Qxd5 Bxe5 24. Qxe5 Rxe5 25. Rxe5 Qb7 26. Rxb5 Qxe5 27. Rxa6 Qe2 28. Rb6 Qxf2+ 29. Kh1 Qg1+ 30. Rxg1 Nf2+ 31. Kh2`;
