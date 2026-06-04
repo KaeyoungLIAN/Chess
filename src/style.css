@@ -225,7 +225,7 @@ body {
 }
 
 /* ═══════════ TUTORIAL ═══════════ */
-.tutorial-layout {
+.tutorial-container {
   display: flex;
   gap: 24px;
   align-items: flex-start;
@@ -233,7 +233,7 @@ body {
 }
 
 .tutorial-nav {
-  flex: 0 0 180px;
+  flex: 0 0 160px;
   background: var(--surface);
   border: 1px solid var(--surface-border);
   border-radius: var(--radius);
@@ -278,6 +278,13 @@ body {
   background: rgba(79,70,229,0.1);
   border-left-color: var(--primary);
   font-weight: 600;
+}
+
+.tutorial-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  gap: 24px;
 }
 
 .tutorial-content {
@@ -337,6 +344,96 @@ body {
   border: none;
   border-top: 1px solid var(--surface-border);
   margin: 20px 0;
+}
+
+/* 演示按钮 */
+.tut-show-btn {
+  margin: 6px 0 12px;
+  background: rgba(79,70,229,0.08);
+  border-color: rgba(79,70,229,0.25);
+  color: var(--primary);
+  font-size: 0.78rem;
+  transition: all 0.15s;
+}
+.tut-show-btn:hover {
+  background: rgba(79,70,229,0.18);
+  border-color: var(--primary);
+}
+
+/* 右侧演示棋盘面板 */
+.tutorial-board-panel {
+  flex: 0 0 280px;
+  position: sticky;
+  top: 16px;
+  align-self: flex-start;
+}
+
+.tutorial-board-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  padding: 0 2px;
+}
+
+.tutorial-board-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.tutorial-demo-name {
+  font-size: 0.75rem;
+  color: var(--primary);
+  font-weight: 500;
+}
+
+#tutorial-board {
+  width: 280px;
+  height: 280px;
+  position: relative;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+
+.tutorial-board-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 0 4px;
+}
+
+.tut-step-counter {
+  font-size: 0.78rem;
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+  min-width: 50px;
+  text-align: center;
+}
+
+.tut-control-hint {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-left: auto;
+  font-style: italic;
+}
+
+/* 开局标签（走法小字） */
+.demo-tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  background: var(--bg-secondary);
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-left: 6px;
+  font-weight: 400;
 }
 
 /* ═══════════ PLACEHOLDER ═══════════ */
@@ -843,11 +940,14 @@ body {
   .side-panel { max-width: 100%; width: 100%; }
   .app-header h1 { font-size: 1.4rem; }
 
-  .tutorial-layout { flex-direction: column; }
+  .tutorial-container { flex-direction: column; }
   .tutorial-nav { flex: none; width: 100%; position: static; }
   .tutorial-nav-list { display: flex; flex-wrap: wrap; }
   .tutorial-nav-item { flex: 1; min-width: 80px; text-align: center; border-left: none; border-bottom: 3px solid transparent; }
   .tutorial-nav-item.active { border-left-color: transparent; border-bottom-color: var(--primary); }
+  .tutorial-main { flex-direction: column; }
+  .tutorial-board-panel { flex: none; width: 100%; max-width: 340px; margin: 0 auto; position: static; }
+  #tutorial-board { width: 100%; height: auto; aspect-ratio: 1 / 1; }
 }
 
 @media (max-width: 500px) {

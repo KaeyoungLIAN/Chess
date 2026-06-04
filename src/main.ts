@@ -5,6 +5,7 @@ import './style.css';
 import { getEngine } from './engine';
 import { AIPlayManager } from './aiPlay';
 import { AnalysisManager } from './analysis';
+import { TutorialManager } from './tutorial';
 
 async function init() {
   const overlay = document.getElementById('loading-overlay')!;
@@ -24,6 +25,7 @@ async function init() {
 
   let aiPlay: AIPlayManager | null = null;
   let analysis: AnalysisManager | null = null;
+  let tutorial: TutorialManager | null = null;
 
   // 导航到指定视图
   function navigateTo(view: string) {
@@ -34,6 +36,8 @@ async function init() {
       if (!aiPlay) aiPlay = new AIPlayManager();
     } else if (view === 'analysis') {
       if (!analysis) analysis = new AnalysisManager();
+    } else if (view === 'tutorial') {
+      if (!tutorial) tutorial = new TutorialManager();
     }
   }
 
@@ -68,6 +72,25 @@ async function init() {
       const target = document.getElementById(`chapter-${chapter}`);
       if (target) target.classList.add('active');
     });
+  });
+
+  // 教程演示按钮
+  document.querySelectorAll('.tut-show-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const demo = (btn as HTMLElement).dataset.demo;
+      if (demo) {
+        if (!tutorial) tutorial = new TutorialManager();
+        tutorial.renderDemo(demo);
+      }
+    });
+  });
+
+  // 教程棋盘步进控制
+  document.getElementById('tut-step-back')?.addEventListener('click', () => {
+    tutorial?.stepBackward();
+  });
+  document.getElementById('tut-step-fwd')?.addEventListener('click', () => {
+    tutorial?.stepForward();
   });
 }
 

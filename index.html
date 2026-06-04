@@ -162,7 +162,7 @@
     <!-- ═══════════ 教学课程视图 ═══════════ -->
     <div id="view-tutorial" class="view">
       <button class="back-home-btn" data-target="tutorial">← 返回</button>
-      <div class="tutorial-layout">
+      <div class="tutorial-container">
         <nav class="tutorial-nav">
           <h3 class="tutorial-nav-title">教学课程</h3>
           <ul class="tutorial-nav-list">
@@ -172,94 +172,196 @@
             <li class="tutorial-nav-item" data-chapter="endgame">残局</li>
           </ul>
         </nav>
-        <div class="tutorial-content">
-          <div class="tutorial-chapter active" id="chapter-overview">
-            <h2>整体概述</h2>
-            <p class="tutorial-meta">国际象棋基础入门</p>
-            <div class="tutorial-body">
-              <p>国际象棋是一项两人对弈的策略棋盘游戏，棋盘为 8×8 方格，双方各执 16 枚棋子。目标是将死对方的王。</p>
-              <p>本教程将从整体规则开始，逐步深入到开局原理、中局战术和残局技巧。</p>
-              <hr />
-              <h3>棋盘与坐标</h3>
-              <p>棋盘从左到右为 a-h 列，从白方视角从下到上为 1-8 行。白方初始棋子放在第 1-2 行，黑方放在第 7-8 行。</p>
-              <h3>棋子走法</h3>
-              <ul>
-                <li><strong>王 (K)</strong> — 任意方向走一格</li>
-                <li><strong>后 (Q)</strong> — 任意方向走任意格</li>
-                <li><strong>车 (R)</strong> — 横竖走任意格</li>
-                <li><strong>象 (B)</strong> — 斜走任意格</li>
-                <li><strong>马 (N)</strong> — L 形走法</li>
-                <li><strong>兵 (P)</strong> — 向前走一格，吃子斜前，升变</li>
-              </ul>
-              <h3>特殊规则</h3>
-              <ul>
-                <li><strong>王车易位</strong> — 王和车同时移动，每局各一次</li>
-                <li><strong>吃过路兵</strong> — 兵斜吃对方刚走两格的兵</li>
-                <li><strong>兵升变</strong> — 兵到底线变成后/车/象/马</li>
-              </ul>
+        <div class="tutorial-main">
+          <div class="tutorial-content">
+            <div class="tutorial-chapter active" id="chapter-overview">
+              <h2>整体概述</h2>
+              <p class="tutorial-meta">国际象棋基础入门</p>
+              <div class="tutorial-body">
+                <p>国际象棋是一项两人对弈的策略棋盘游戏，棋盘为 8×8 方格，双方各执 16 枚棋子。目标是将死对方的王——即让对方王无路可逃。</p>
+                <p>本教程从整体规则入手，逐步深入开局原理、中局战术和残局技巧。每个知识点旁都配有「在棋盘上演示」按钮，点击即可在右侧棋盘上观看走法演示。</p>
+
+                <h3>棋盘与坐标</h3>
+                <p>棋盘从左到右为 a-h 列，从白方视角从下到上为 1-8 行。白方初始棋子放在第 1-2 行（底部），黑方放在第 7-8 行（顶部）。每个格子用一个字母+一个数字表示，例如 e4（中心格）、a1（白方左下角）。</p>
+                <button class="btn btn-sm tut-show-btn" data-demo="initial-setup">在棋盘上演示 ▸</button>
+
+                <h3>棋子走法</h3>
+                <ul>
+                  <li><strong>王 ♔</strong> — 任意方向走一格，是整个棋局最重要的棋子</li>
+                  <li><strong>后 ♕</strong> — 任意方向走任意格，是威力最大的棋子</li>
+                  <li><strong>车 ♖</strong> — 横竖走任意格，仅次于后</li>
+                  <li><strong>象 ♗</strong> — 斜走任意格，永远在同色格上</li>
+                  <li><strong>马 ♘</strong> — L 形走法（向前两格再横一格），是唯一能跳过其他棋子的棋子</li>
+                  <li><strong>兵 ♙</strong> — 向前走一格，吃子斜前方；从起始位置可以走两格；到底线可升变为后/车/象/马</li>
+                </ul>
+                <button class="btn btn-sm tut-show-btn" data-demo="piece-movement">在棋盘上演示 ▸</button>
+
+                <h3>特殊规则</h3>
+                <ul>
+                  <li><strong>王车易位</strong> — 王和车同时移动，每局各一次。王向车方向走两格，车越到王另一侧。条件是王和车都未动过、中间无棋子、王不经过被攻击格子</li>
+                  <li><strong>吃过路兵</strong> — 当对方兵从起始位置走了两格，恰好和你兵相邻时，你可以斜吃它（就像它只走了一格一样）</li>
+                  <li><strong>兵升变</strong> — 兵到达对方底线即升变为后/车/象/马（通常选后）</li>
+                </ul>
+                <button class="btn btn-sm tut-show-btn" data-demo="castling">在棋盘上演示 ▸</button>
+                <button class="btn btn-sm tut-show-btn" data-demo="en-passant">在棋盘上演示 ▸</button>
+              </div>
+            </div>
+            <div class="tutorial-chapter" id="chapter-opening">
+              <h2>开局</h2>
+              <p class="tutorial-meta">开局原理与 12 个经典开局详解</p>
+              <div class="tutorial-body">
+                <p>开局是棋局的前 10-15 步，目标是快速出子、控制中心、保护王的安全。</p>
+
+                <h3>开局三原则</h3>
+                <ol>
+                  <li><strong>抢占中心</strong> — 控制 e4/d4/e5/d5 这四个中心格</li>
+                  <li><strong>先出轻子，再出重子</strong> — 马和象先出动，后和车晚出动</li>
+                  <li><strong>尽早易位</strong> — 把王藏到角落用兵保护，激活车</li>
+                </ol>
+
+                <p>开局按风格分为：<strong>开放性开局</strong>（1.e4 e5）、<strong>半开放性开局</strong>（1.e4 非e5）、<strong>封闭性开局</strong>（1.d4 / 其他）。以下是针对1.e4和1.d4最常见也最值得学习的12个经典开局。</p>
+
+                <!-- ── 开放性开局 ── -->
+                <h3>▎ 开放性开局（白方 1.e4，黑方 1...e5）</h3>
+
+                <h4>① 意大利开局 <span class="demo-tag">1.e4 e5 2.Nf3 Nc6 3.Bc4</span></h4>
+                <p>最古老也最直接的开局。白方将象放在 c4，瞄准黑方最薄弱的 f7 兵。黑方以 Bc5 对称应对。早期学习意大利开局能帮初学者理解中心控制与子力协调的基本原理。白方后续多走 c3-d4 巩固中心。</p>
+                <button class="btn btn-sm tut-show-btn" data-demo="italian-opening">在棋盘上演示 ▸</button>
+
+                <h4>② 西班牙开局 <span class="demo-tag">1.e4 e5 2.Nf3 Nc6 3.Bb5</span></h4>
+                <p>也叫鲁伊·洛佩兹（Ruy Lopez），是 1.e4 中最受顶尖棋手喜爱的开局。Bb5 并不直接吃马，而是对 e5 兵施加间接压力——黑方如果走 a6 赶象，白方退象后仍然保持着对中心的影响。西班牙开局变化丰富，从封闭体系到开放变例应有尽有。</p>
+                <button class="btn btn-sm tut-show-btn" data-demo="spanish-opening">在棋盘上演示 ▸</button>
+
+                <h4>③ 苏格兰开局 <span class="demo-tag">1.e4 e5 2.Nf3 Nc6 3.d4</span></h4>
+                <p>白方直接打开中心，双方很快进入开放的中局局面。适合喜欢明朗战术局面的棋手。在第 3 步面对 Nf3+Nc6 的情况立即 d4，与意大利开局的 c3-d4 计划相比提前了一步打开中心，但也给了黑方更大活动空间。</p>
+                <button class="btn btn-sm tut-show-btn" data-demo="scotch-game">在棋盘上演示 ▸</button>
+
+                <h4>④ 王翼弃兵 <span class="demo-tag">1.e4 e5 2.f4</span></h4>
+                <p>19 世纪浪漫主义时代的代表作。白方用 f4 兵做诱饵，引诱黑方吃兵（exf4），白方借此快速出子、控制中心并发动王翼进攻。现代比赛中较少见，但在观赏性和战术训练方面价值极高，能锻炼进攻直觉。</p>
+                <button class="btn btn-sm tut-show-btn" data-demo="kings-gambit">在棋盘上演示 ▸</button>
+
+                <!-- ── 半开放性开局 ── -->
+                <h3>▎ 半开放性开局（白方 1.e4，黑方不走 1...e5）</h3>
+
+                <h4>⑤ 西西里防御 <span class="demo-tag">1.e4 c5</span></h4>
+                <p>对 1.e4 最受欢迎且胜率最高的应对。黑方从后翼反攻中心，避免了开放性开局中白方走 e4-e5 夺空间的威胁。走法复杂多变，从尖锐的龙式变例（...g6）到稳健的谢韦尼根变例（...e6）都有。适合愿意深入研究开局理论的棋手。</p>
+                <button class="btn btn-sm tut-show-btn" data-demo="sicilian-defense">在棋盘上演示 ▸</button>
+
+                <h4>⑥ 法兰西防御 <span class="demo-tag">1.e4 e6 2.d4 d5</span></h4>
+                <p>黑方用 e6 支持 d5 挑战白方中心，形成一个封闭性较强的兵结构。白方常有三马变例、塔拉什变例、兑兵变例等选择。黑方的 c5 反击是开局关键——在稳固防守后，用后翼 c7-c5 的反击挑战白方中心。</p>
+                <button class="btn btn-sm tut-show-btn" data-demo="french-defense">在棋盘上演示 ▸</button>
+
+                <h4>⑦ 卡罗-康防御 <span class="demo-tag">1.e4 c6 2.d4 d5</span></h4>
+                <p>法兰西的"稳健表亲"。黑方用 c6 支持 d5，但避免了法兰西中黑方 c8 象被自己兵链困住的问题。开局结构清晰，计划明确——黑方用 c6-d5 结构固守，然后主动出象到 f5 或 g4。适合偏好稳健局面的棋手。</p>
+                <button class="btn btn-sm tut-show-btn" data-demo="caro-kann">在棋盘上演示 ▸</button>
+
+                <h4>⑧ 皮尔茨防御 <span class="demo-tag">1.e4 d6 2.d4 Nf6 3.Nc3 g6</span></h4>
+                <p>也叫乌菲姆采夫防御，黑方让白方完全占领中心，然后用 g6-Bg7 的侧翼象对中心施加间接压力。皮尔茨体现了"先让对方靠近，再打反击"的现代开局思路，适合喜欢灵活局面的棋手。</p>
+                <button class="btn btn-sm tut-show-btn" data-demo="pirc-defense">在棋盘上演示 ▸</button>
+
+                <!-- ── 封闭性开局 ── -->
+                <h3>▎ 封闭性开局（白方 1.d4 或英国式开局 c4 等）</h3>
+
+                <h4>⑨ 后翼弃兵 <span class="demo-tag">1.d4 d5 2.c4</span></h4>
+                <p>后兵开局中最经典的代表。白方用 c4 兵挑战黑方 d5 中心。黑方可以选择接受弃兵（dxc4）或拒绝（e6 保持中心）。正统防御（...e6）是最常见的变例，双方围绕 d5 和 e5 控制权展开争夺。</p>
+                <button class="btn btn-sm tut-show-btn" data-demo="queens-gambit">在棋盘上演示 ▸</button>
+
+                <h4>⑩ 斯拉夫防御 <span class="demo-tag">1.d4 d5 2.c4 c6</span></h4>
+                <p>后翼弃兵体系中黑方最稳健的选择之一。c6 支持 d5 的同时，保持了 c8 象的出动线路——这是斯拉夫相比正统防御的主要优势。黑方也可以选择接受弃兵（dxc4），形成"斯拉夫接受的哥本哈根变例"。</p>
+                <button class="btn btn-sm tut-show-btn" data-demo="slav-defense">在棋盘上演示 ▸</button>
+
+                <h4>⑪ 古印度防御 <span class="demo-tag">1.d4 Nf6 2.c4 g6 3.Nc3 Bg7</span></h4>
+                <p>现代开局理论的巅峰之作。黑方让白方先占住中心（e4-d4 兵链），然后用 g6-Bg7 的侧翼象施加长距离压力。黑方的核心反击计划是 ...e5 或 ...c5，有"古印度进攻"（...e5 夺取中心）和"古印度防御"（坚固防守）之分。</p>
+                <button class="btn btn-sm tut-show-btn" data-demo="kings-indian">在棋盘上演示 ▸</button>
+
+                <h4>⑫ 尼姆佐维奇防御 <span class="demo-tag">1.d4 Nf6 2.c4 e6 3.Nc3 Bb4</span></h4>
+                <p>由捷克-法国棋手尼姆佐维奇创立的经典开局。黑方用象牵制 c3 马，阻止白方建立 e4 双兵中心。这是后兵开局中最富战略思想的开局之一，体现了"用棋子灵活性弥补空间劣势"的现代开局理念。</p>
+                <button class="btn btn-sm tut-show-btn" data-demo="nimzo-indian">在棋盘上演示 ▸</button>
+
+                <h3>开局选择建议</h3>
+                <ul>
+                  <li><strong>初学者</strong> — 意大利开局（白方）+ 西西里防御（黑方），能接触到最广的局面类型</li>
+                  <li><strong>偏好进攻</strong> — 王翼弃兵（白方）+ 古印度防御（黑方），锻炼攻击想象力</li>
+                  <li><strong>偏好稳健</strong> — 后翼弃兵（白方）+ 卡罗-康（黑方），结构清晰，计划明确</li>
+                  <li><strong>想深入理论</strong> — 西班牙开局（白方）+ 尼姆佐维奇（黑方），变化丰富值得深挖</li>
+                </ul>
+              </div>
+            </div>
+            <div class="tutorial-chapter" id="chapter-middlegame">
+              <h2>中局</h2>
+              <p class="tutorial-meta">基本战术与局面判断方法</p>
+              <div class="tutorial-body">
+                <p>中局是棋局中最复杂的阶段，双方子力全面接触。掌握基本战术是提升棋力的最快途径。</p>
+
+                <h3>四大基本战术</h3>
+
+                <h4>牵制（Pin）</h4>
+                <p>利用长线子力（后、车、象）限制对方棋子移动，因为该棋子后面藏着一个更有价值的棋子（通常是王或后）。牵制分为"绝对牵制"（后面是王，不能动）和"相对牵制"（后面是后或其他棋子，动则丢子）。</p>
+                <button class="btn btn-sm tut-show-btn" data-demo="pin-tactic">在棋盘上演示 ▸</button>
+
+                <h4>双击 / 马叉（Fork）</h4>
+                <p>一个棋子同时攻击对方两个或更多棋子。马是执行双击的专家——因为马的走法独特，对方往往很难同时防守两个被攻击的目标。后、兵也能做双击。</p>
+                <button class="btn btn-sm tut-show-btn" data-demo="fork-tactic">在棋盘上演示 ▸</button>
+
+                <h4>闪击（Discovered Attack）</h4>
+                <p>移开中间的一个棋子，露出后面棋子的攻击线路。如果后面的棋子攻击对方王，就叫"闪将"（Discovered Check）。闪击是中局中最具杀伤力的战术之一，因为移开的棋子本身也可能参与攻击。</p>
+                <button class="btn btn-sm tut-show-btn" data-demo="discovered-attack">在棋盘上演示 ▸</button>
+
+                <h4>串击（Skewer）</h4>
+                <p>牵制的反面——你的长线子力攻击对方一个棋子，当它移开后，后面的棋子暴露在被攻击的位置。串击通常发生在后、车、象身上，王或后在前，后面跟着另一个有价值的棋子。</p>
+                <button class="btn btn-sm tut-show-btn" data-demo="skewer-tactic">在棋盘上演示 ▸</button>
+
+                <h3>局面评估要素</h3>
+                <p>除了战术，中局还需要学会评估局面质量。以下是四个核心评估维度：</p>
+                <ul>
+                  <li><strong>子力对比</strong> — 棋子标准价值：后 9 分、车 5 分、象/马 3 分、兵 1 分</li>
+                  <li><strong>中心控制</strong> — 谁控制了 e4/d4/e5/d5 四个中心格</li>
+                  <li><strong>王的安全性</strong> — 王的易位位置是否稳固，周围兵有没有被破坏</li>
+                  <li><strong>子力活跃度</strong> — 棋子是否都发挥了最大作用，还是陷在角落</li>
+                </ul>
+              </div>
+            </div>
+            <div class="tutorial-chapter" id="chapter-endgame">
+              <h2>残局</h2>
+              <p class="tutorial-meta">残局原理与关键技巧</p>
+              <div class="tutorial-body">
+                <p>残局是棋局的收尾阶段，子力大幅减少，王的角色从"被保护对象"变为"强力战斗单位"。</p>
+
+                <h3>关键残局类型</h3>
+
+                <h4>单后杀王</h4>
+                <p>用王配合后逼对方王到棋盘边线。核心方法是"走王到对面王的对面"——后控制一排/一列，王逐步逼进，直到将死。</p>
+                <button class="btn btn-sm tut-show-btn" data-demo="king-queen-mate">在棋盘上演示 ▸</button>
+
+                <h4>单车杀王</h4>
+                <p>车加王对单王。关键技巧是"对王"（opposition）——两个王正面相对时，轮到走的一方被迫让出空间。车负责切断王的一排线路，王负责逼进。</p>
+                <button class="btn btn-sm tut-show-btn" data-demo="king-rook-mate">在棋盘上演示 ▸</button>
+
+                <h4>通路兵残局</h4>
+                <p>当一个兵在前进道路上没有对方兵阻挡时，它就变成了"通路兵"。通路兵是残局中最大的优势之一——它牵制对方王，迫使对方用子力来阻挡它，从而在其他区域创造机会。</p>
+                <button class="btn btn-sm tut-show-btn" data-demo="passed-pawn">在棋盘上演示 ▸</button>
+
+                <h3>残局原则</h3>
+                <ul>
+                  <li><strong>王要积极参战</strong> — 残局中王是无价之宝，一定要走到中心</li>
+                  <li><strong>通路兵是关键优势</strong> — 拥有通路兵的一方占优</li>
+                  <li><strong>子力交换前先计算</strong> — 交换马或象之前，先想清楚残局是否能用剩下子力获胜</li>
+                  <li><strong>兵结构决定走向</strong> — 叠兵、孤兵在残局中会变成致命弱点</li>
+                </ul>
+              </div>
             </div>
           </div>
-          <div class="tutorial-chapter" id="chapter-opening">
-            <h2>开局</h2>
-            <p class="tutorial-meta">开局原理与常见布局</p>
-            <div class="tutorial-body">
-              <p>开局是棋局的前 10-15 步，目标是快速出子、控制中心、保护王的安全。</p>
-              <h3>开局三原则</h3>
-              <ol>
-                <li>抢占中心（e4/d4/e5/d5）</li>
-                <li>先出轻子（马和象），再出重子（车和后）</li>
-                <li>尽早王车易位，保护王</li>
-              </ol>
-              <h3>常见开局</h3>
-              <ul>
-                <li><strong>意大利开局</strong> — 1.e4 e5 2.Nf3 Nc6 3.Bc4</li>
-                <li><strong>西班牙开局</strong> — 1.e4 e5 2.Nf3 Nc6 3.Bb5</li>
-                <li><strong>西西里防御</strong> — 1.e4 c5</li>
-                <li><strong>后翼弃兵</strong> — 1.d4 d5 2.c4</li>
-              </ul>
+          <div class="tutorial-board-panel">
+            <div class="tutorial-board-header">
+              <span class="tutorial-board-label">演示棋盘</span>
+              <span id="tutorial-demo-name" class="tutorial-demo-name">初始局面</span>
             </div>
-          </div>
-          <div class="tutorial-chapter" id="chapter-middlegame">
-            <h2>中局</h2>
-            <p class="tutorial-meta">战术与局面判断</p>
-            <div class="tutorial-body">
-              <p>中局是棋局中最复杂的阶段，双方子力全面接触。</p>
-              <h3>基本战术</h3>
-              <ul>
-                <li><strong>牵制</strong> — 利用长线子力限制对方移动</li>
-                <li><strong>双击</strong> — 一个棋子同时攻击对方两个棋子</li>
-                <li><strong>闪击</strong> — 移开中间棋子露出后面棋子的攻击</li>
-                <li><strong>引入/引离</strong> — 诱使对方棋子离开关键防御位置</li>
-              </ul>
-              <h3>局面评估要素</h3>
-              <ul>
-                <li>子力对比（棋子价值）</li>
-                <li>中心控制</li>
-                <li>王的安全性</li>
-                <li>兵结构（叠兵、孤兵、通路兵）</li>
-                <li>子力活跃度</li>
-              </ul>
-            </div>
-          </div>
-          <div class="tutorial-chapter" id="chapter-endgame">
-            <h2>残局</h2>
-            <p class="tutorial-meta">残局原理与关键技巧</p>
-            <div class="tutorial-body">
-              <p>残局是棋局的收尾阶段，子力大幅减少，王的作用变得极为重要。</p>
-              <h3>关键残局</h3>
-              <ul>
-                <li><strong>王对王</strong> — 对王距离决定胜负</li>
-                <li><strong>单后杀王</strong> — 利用王配合后逼王到边线</li>
-                <li><strong>单车杀王</strong> — 王和车配合将死对方王</li>
-                <li><strong>兵残局</strong> — 对王与通路兵技巧</li>
-              </ul>
-              <h3>残局原则</h3>
-              <ul>
-                <li>王要积极参战</li>
-                <li>通路兵是关键优势</li>
-                <li>子力交换前先判断残局胜负</li>
-                <li>主动的一方要制造多个弱点</li>
-              </ul>
+            <div id="tutorial-board"></div>
+            <div class="tutorial-board-controls">
+              <button id="tut-step-back" class="btn btn-sm" disabled title="上一步">◀</button>
+              <span id="tut-step-counter" class="tut-step-counter">0 / 0</span>
+              <button id="tut-step-fwd" class="btn btn-sm" disabled title="下一步">▶</button>
+              <span class="tut-control-hint">点击演示按钮开始</span>
             </div>
           </div>
         </div>
