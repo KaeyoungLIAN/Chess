@@ -1,8 +1,5 @@
 /* ======================================================
    Chess Trainer — Design System
-   Style: Minimal Swiss + Tech Startup
-   Palette: Indigo (#4F46E5) + Orange Accent (#EA580C)
-   Font: Space Grotesk (headings) + Inter (body)
    ====================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
@@ -11,9 +8,7 @@
 :root {
   --primary: #4F46E5;
   --primary-hover: #4338CA;
-  --primary-light: #EEF2FF;
   --accent: #EA580C;
-  --accent-hover: #D4530A;
 
   --bg: #0F172A;
   --bg-secondary: #1E293B;
@@ -28,19 +23,18 @@
 
   --success: #22C55E;
   --danger: #EF4444;
-  --danger-hover: #DC2626;
   --warning: #F59E0B;
 
-  --light-square: #E8D0A8;
-  --dark-square: #B58863;
-  --selected-square: rgba(79,70,229,0.4);
-  --legal-dot: rgba(79,70,229,0.5);
-  --legal-capture-border: rgba(79,70,229,0.6);
-  --last-move-bg: rgba(0,0,0,0.12);
+  /* 棋盘配色 */
+  --light-square: #f0d9b5;
+  --dark-square: #b58863;
+  --selected-square: #7fc47f;
+  --last-move-square: rgba(155, 199, 0, 0.3);
+  --legal-dot: rgba(0,0,0,0.18);
+  --legal-capture-border: rgba(0,0,0,0.25);
 
   --radius: 10px;
   --radius-sm: 6px;
-  --shadow: 0 4px 12px rgba(0,0,0,0.2);
   --shadow-lg: 0 8px 30px rgba(0,0,0,0.3);
 
   --font-heading: 'Space Grotesk', sans-serif;
@@ -49,11 +43,7 @@
 }
 
 /* ── Reset ── */
-*, *::before, *::after {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 html {
   font-size: 16px;
@@ -69,30 +59,22 @@ body {
   line-height: 1.5;
 }
 
-::selection {
-  background: rgba(79,70,229,0.3);
-  color: var(--text);
-}
+::selection { background: rgba(79,70,229,0.3); color: var(--text); }
 
-/* ── Utilities ── */
 .hidden { display: none !important; }
 
-/* ── App Shell ── */
-#app {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
+/* ── App ── */
+#app { max-width: 1280px; margin: 0 auto; padding: 0 20px; }
 
 /* ── Header ── */
 .app-header {
   text-align: center;
-  padding: 28px 0 20px;
+  padding: 24px 0 16px;
 }
 
 .app-header h1 {
   font-family: var(--font-heading);
-  font-size: 1.75rem;
+  font-size: 1.6rem;
   font-weight: 700;
   letter-spacing: -0.03em;
   background: linear-gradient(135deg, #fff 0%, #94A3B8 100%);
@@ -103,20 +85,19 @@ body {
 }
 
 .app-header .subtitle {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   color: var(--text-muted);
-  font-weight: 400;
   letter-spacing: 0.05em;
 }
 
-/* ── Navigation Tabs ── */
+/* ── Tabs ── */
 .nav-tabs {
   display: inline-flex;
   background: var(--bg-secondary);
   border-radius: var(--radius);
   padding: 3px;
   gap: 2px;
-  margin-top: 14px;
+  margin-top: 12px;
 }
 
 .nav-btn {
@@ -132,22 +113,14 @@ body {
   transition: all 0.2s;
 }
 
-.nav-btn:hover {
-  color: var(--text);
-  background: rgba(255,255,255,0.05);
-}
-
-.nav-btn.active {
-  background: var(--primary);
-  color: white;
-  font-weight: 600;
-}
+.nav-btn:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+.nav-btn.active { background: var(--primary); color: white; font-weight: 600; }
 
 /* ── Views ── */
 .view { display: none; }
 .view.active { display: block; }
 
-/* ── Game Layout ── */
+/* ── Layout ── */
 .game-layout {
   display: flex;
   gap: 24px;
@@ -155,16 +128,14 @@ body {
   justify-content: center;
 }
 
-.board-section {
-  flex: 0 0 auto;
-}
+.board-section { flex: 0 0 auto; }
 
-/* ── Chess Board Container ── */
+/* ── Chess Board ── */
 #chess-board, #analysis-board {
   width: 560px;
   height: 560px;
   position: relative;
-  border-radius: var(--radius);
+  border-radius: 4px;
   overflow: hidden;
   box-shadow: var(--shadow-lg);
 }
@@ -184,61 +155,58 @@ body {
   cursor: pointer;
   position: relative;
   user-select: none;
-  transition: background 0.12s, box-shadow 0.12s;
-}
-
-.square svg {
-  display: block;
-  width: 85%;
-  height: 85%;
 }
 
 .square.light { background: var(--light-square); }
 .square.dark { background: var(--dark-square); }
 
-.square.selected {
-  background: #829769 !important;
-}
-
-.square.highlight {
-  box-shadow: inset 0 0 0 3px rgba(255,255,0,0.4);
-}
-
+/* 上一步走棋高亮 */
 .square.last-move {
-  background: var(--last-move-bg) !important;
+  background: var(--last-move-square) !important;
 }
 
+/* 选中棋子 */
+.square.selected {
+  background: var(--selected-square) !important;
+}
+
+/* 合法走法提示 */
 .square.legal-move::after {
   content: '';
   position: absolute;
-  width: 26%;
-  height: 26%;
+  width: 28%;
+  height: 28%;
   background: var(--legal-dot);
   border-radius: 50%;
+  pointer-events: none;
 }
 
-.square.legal-capture {
-  box-shadow: inset 0 0 0 3px var(--legal-capture-border);
+/* 棋子图片 */
+.piece-img {
+  display: block;
+  width: 82%;
+  height: 82%;
+  object-fit: contain;
+  pointer-events: none;
+  cursor: pointer;
 }
 
-/* 棋子 SVG 可点击区域覆盖 */
-.square svg { pointer-events: none; }
-
-.piece {
-  cursor: grab;
+/* 坐标标注 */
+.coord {
+  position: absolute;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(0,0,0,0.35);
   line-height: 1;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.2);
-  transition: none;
+  pointer-events: none;
 }
-
-.piece:active { cursor: grabbing; }
-
-.square.fading { opacity: 0.5; }
+.coord-rank { top: 2px; left: 3px; }
+.coord-file { bottom: 2px; right: 3px; }
 
 /* ── Side Panel ── */
 .side-panel {
   flex: 1;
-  min-width: 280px;
+  min-width: 290px;
   max-width: 340px;
 }
 
@@ -247,17 +215,17 @@ body {
   border: 1px solid var(--surface-border);
   border-radius: var(--radius);
   padding: 16px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .panel-section h3 {
   font-family: var(--font-heading);
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--text-muted);
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 /* ── Buttons ── */
@@ -277,95 +245,32 @@ body {
   color: var(--text);
 }
 
-.btn:hover {
-  background: var(--surface-hover);
-  border-color: rgba(255,255,255,0.15);
-}
+.btn:hover { background: var(--surface-hover); border-color: rgba(255,255,255,0.15); }
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
 
-.btn:active {
-  transform: scale(0.97);
-}
+.btn-primary { background: var(--primary); color: white; border-color: var(--primary); }
+.btn-primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
 
-.btn-primary {
-  background: var(--primary);
-  color: white;
-  border-color: var(--primary);
-}
+.btn-danger { color: var(--danger); border-color: rgba(239,68,68,0.3); background: transparent; }
+.btn-danger:hover { background: rgba(239,68,68,0.1); border-color: var(--danger); }
 
-.btn-primary:hover {
-  background: var(--primary-hover);
-  border-color: var(--primary-hover);
-}
+.btn-ghost { background: transparent; border-color: transparent; color: var(--text-muted); font-size: 0.8rem; }
+.btn-ghost:hover { color: var(--text-secondary); background: rgba(255,255,255,0.04); }
 
-.btn-danger {
-  background: transparent;
-  color: var(--danger);
-  border-color: rgba(239,68,68,0.3);
-}
-
-.btn-danger:hover {
-  background: rgba(239,68,68,0.1);
-  border-color: var(--danger);
-}
-
-.btn-ghost {
-  background: transparent;
-  border-color: transparent;
-  color: var(--text-muted);
-  font-size: 0.8rem;
-}
-
-.btn-ghost:hover {
-  color: var(--text-secondary);
-  background: rgba(255,255,255,0.04);
-}
-
-.btn-full {
-  width: 100%;
-}
-
-.btn-secondary {
-  background: transparent;
-  border-color: var(--surface-border);
-}
-
-.btn-secondary:hover {
-  background: rgba(255,255,255,0.06);
-}
-
-.btn-sm {
-  padding: 6px 12px;
-  font-size: 0.8rem;
-}
-
-.btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.btn-group {
-  display: flex;
-  gap: 4px;
-}
-
-.btn-group .btn.active {
-  background: var(--primary);
-  color: white;
-  border-color: var(--primary);
-}
+.btn-full { width: 100%; }
+.btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+.btn-group { display: flex; gap: 4px; }
+.btn-group .btn.active { background: var(--primary); color: white; border-color: var(--primary); }
 
 /* ── Difficulty Selector ── */
-.difficulty-selector {
-  margin-bottom: 14px;
-}
-
-.difficulty-selector label {
+.difficulty-selector { margin-bottom: 12px; }
+.difficulty-selector label, .color-selector label {
   display: block;
-  font-size: 0.75rem;
+  font-size: 0.73rem;
   font-weight: 500;
   color: var(--text-secondary);
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .difficulty-slider-container {
@@ -386,7 +291,6 @@ body {
 
 .difficulty-slider-container input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  appearance: none;
   width: 16px;
   height: 16px;
   border-radius: 50%;
@@ -405,6 +309,8 @@ body {
   border: 2px solid var(--bg);
 }
 
+.color-selector { margin-bottom: 12px; }
+
 .badge {
   display: inline-flex;
   align-items: center;
@@ -415,38 +321,16 @@ body {
   font-weight: 600;
 }
 
-.badge-level {
-  background: var(--primary);
-  color: white;
-}
+.badge-level { background: var(--primary); color: white; }
 
-.color-selector {
-  margin-bottom: 14px;
-}
-
-.color-selector label {
-  display: block;
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--text-secondary);
-  margin-bottom: 8px;
-}
-
-.game-actions {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 10px;
-}
-
-.game-actions .btn {
-  flex: 1;
-}
+.game-actions { display: flex; gap: 6px; margin-bottom: 8px; }
+.game-actions .btn { flex: 1; }
 
 .game-info-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .game-turn-indicator {
@@ -457,39 +341,23 @@ body {
 
 /* ── Move List ── */
 .move-list {
-  max-height: 280px;
+  max-height: 260px;
   overflow-y: auto;
   font-family: var(--font-mono);
   font-size: 0.8rem;
   line-height: 1.8;
 }
 
-.move-list::-webkit-scrollbar {
-  width: 4px;
-}
-
-.move-list::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.move-list::-webkit-scrollbar-thumb {
-  background: var(--surface-hover);
-  border-radius: 2px;
-}
+.move-list::-webkit-scrollbar { width: 4px; }
+.move-list::-webkit-scrollbar-track { background: transparent; }
+.move-list::-webkit-scrollbar-thumb { background: var(--surface-hover); border-radius: 2px; }
 
 .move-entry {
   display: flex;
   padding: 1px 6px;
   border-radius: 4px;
 }
-
-.move-entry:hover {
-  background: rgba(255,255,255,0.04);
-}
-
-.move-entry.current {
-  background: rgba(255,255,255,0.06);
-}
+.move-entry:hover { background: rgba(255,255,255,0.04); }
 
 .move-number {
   width: 28px;
@@ -505,17 +373,7 @@ body {
   padding: 0 4px;
   border-radius: 3px;
 }
-
-.move-white:hover, .move-black:hover {
-  background: rgba(255,255,255,0.06);
-}
-
-.move-entry.current .move-white.current,
-.move-entry.current .move-black.current {
-  background: var(--primary);
-  color: white;
-  border-radius: 3px;
-}
+.move-white:hover, .move-black:hover { background: rgba(255,255,255,0.06); }
 
 /* ── Game Status ── */
 .game-status {
@@ -525,19 +383,17 @@ body {
   font-weight: 600;
   letter-spacing: -0.01em;
 }
-
 .game-status .win { color: var(--success); }
 .game-status .lose { color: var(--danger); }
 .game-status .draw { color: var(--warning); }
 
-/* ── Analysis Controls ── */
+/* ── Analysis ── */
 .nav-controls {
   display: flex;
   align-items: center;
   gap: 8px;
   justify-content: center;
 }
-
 .nav-controls .btn {
   width: 36px;
   height: 36px;
@@ -581,7 +437,7 @@ body {
 .eval-best { color: var(--success); }
 .eval-mistake { color: var(--danger); }
 
-/* ── PGN Input ── */
+/* ── PGN ── */
 #pgn-input {
   width: 100%;
   resize: vertical;
@@ -597,16 +453,10 @@ body {
   outline: none;
   transition: border-color 0.15s;
 }
+#pgn-input:focus { border-color: var(--primary); }
+#pgn-input::placeholder { color: var(--text-muted); }
 
-#pgn-input:focus {
-  border-color: var(--primary);
-}
-
-#pgn-input::placeholder {
-  color: var(--text-muted);
-}
-
-/* ── Loading Overlay ── */
+/* ── Loading ── */
 .loading-overlay {
   position: fixed;
   inset: 0;
@@ -619,7 +469,6 @@ body {
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }
-
 .loading-overlay.hidden { display: none; }
 
 .loading-spinner {
@@ -631,7 +480,6 @@ body {
   animation: spin 0.7s linear infinite;
   margin-bottom: 14px;
 }
-
 @keyframes spin { to { transform: rotate(360deg); } }
 
 .loading-overlay p {
@@ -641,39 +489,24 @@ body {
 }
 
 /* ── Responsive ── */
-@media (max-width: 860px) {
-  .game-layout {
-    flex-direction: column;
-    align-items: center;
-  }
+@media (max-width: 960px) {
+  .game-layout { flex-direction: column; align-items: center; }
 
   #chess-board, #analysis-board {
     width: 100%;
-    max-width: 440px;
+    max-width: 480px;
     height: auto;
     aspect-ratio: 1 / 1;
   }
 
-  .side-panel {
-    max-width: 100%;
-    width: 100%;
-  }
-
-  .app-header h1 {
-    font-size: 1.4rem;
-  }
+  .side-panel { max-width: 100%; width: 100%; }
+  .app-header h1 { font-size: 1.4rem; }
 }
 
-@media (max-width: 480px) {
-  #app {
-    padding: 0 12px;
-  }
-
-  #chess-board, #analysis-board {
-    max-width: 100%;
-  }
-
-  .panel-section {
-    padding: 12px;
-  }
+@media (max-width: 500px) {
+  #app { padding: 0 12px; }
+  #chess-board, #analysis-board { max-width: 100%; }
+  .panel-section { padding: 12px; }
+  .coord { font-size: 9px; }
+  .piece-img { width: 78%; height: 78%; }
 }
