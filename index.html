@@ -162,10 +162,107 @@
     <!-- ═══════════ 教学课程视图 ═══════════ -->
     <div id="view-tutorial" class="view">
       <button class="back-home-btn" data-target="tutorial">← 返回</button>
-      <div class="placeholder-view">
-        <div class="placeholder-icon">📖</div>
-        <h2 class="placeholder-title">教学课程</h2>
-        <p class="placeholder-desc">即将上线，敬请期待</p>
+      <div class="tutorial-layout">
+        <nav class="tutorial-nav">
+          <h3 class="tutorial-nav-title">教学课程</h3>
+          <ul class="tutorial-nav-list">
+            <li class="tutorial-nav-item active" data-chapter="overview">整体概述</li>
+            <li class="tutorial-nav-item" data-chapter="opening">开局</li>
+            <li class="tutorial-nav-item" data-chapter="middlegame">中局</li>
+            <li class="tutorial-nav-item" data-chapter="endgame">残局</li>
+          </ul>
+        </nav>
+        <div class="tutorial-content">
+          <div class="tutorial-chapter active" id="chapter-overview">
+            <h2>整体概述</h2>
+            <p class="tutorial-meta">国际象棋基础入门</p>
+            <div class="tutorial-body">
+              <p>国际象棋是一项两人对弈的策略棋盘游戏，棋盘为 8×8 方格，双方各执 16 枚棋子。目标是将死对方的王。</p>
+              <p>本教程将从整体规则开始，逐步深入到开局原理、中局战术和残局技巧。</p>
+              <hr />
+              <h3>棋盘与坐标</h3>
+              <p>棋盘从左到右为 a-h 列，从白方视角从下到上为 1-8 行。白方初始棋子放在第 1-2 行，黑方放在第 7-8 行。</p>
+              <h3>棋子走法</h3>
+              <ul>
+                <li><strong>王 (K)</strong> — 任意方向走一格</li>
+                <li><strong>后 (Q)</strong> — 任意方向走任意格</li>
+                <li><strong>车 (R)</strong> — 横竖走任意格</li>
+                <li><strong>象 (B)</strong> — 斜走任意格</li>
+                <li><strong>马 (N)</strong> — L 形走法</li>
+                <li><strong>兵 (P)</strong> — 向前走一格，吃子斜前，升变</li>
+              </ul>
+              <h3>特殊规则</h3>
+              <ul>
+                <li><strong>王车易位</strong> — 王和车同时移动，每局各一次</li>
+                <li><strong>吃过路兵</strong> — 兵斜吃对方刚走两格的兵</li>
+                <li><strong>兵升变</strong> — 兵到底线变成后/车/象/马</li>
+              </ul>
+            </div>
+          </div>
+          <div class="tutorial-chapter" id="chapter-opening">
+            <h2>开局</h2>
+            <p class="tutorial-meta">开局原理与常见布局</p>
+            <div class="tutorial-body">
+              <p>开局是棋局的前 10-15 步，目标是快速出子、控制中心、保护王的安全。</p>
+              <h3>开局三原则</h3>
+              <ol>
+                <li>抢占中心（e4/d4/e5/d5）</li>
+                <li>先出轻子（马和象），再出重子（车和后）</li>
+                <li>尽早王车易位，保护王</li>
+              </ol>
+              <h3>常见开局</h3>
+              <ul>
+                <li><strong>意大利开局</strong> — 1.e4 e5 2.Nf3 Nc6 3.Bc4</li>
+                <li><strong>西班牙开局</strong> — 1.e4 e5 2.Nf3 Nc6 3.Bb5</li>
+                <li><strong>西西里防御</strong> — 1.e4 c5</li>
+                <li><strong>后翼弃兵</strong> — 1.d4 d5 2.c4</li>
+              </ul>
+            </div>
+          </div>
+          <div class="tutorial-chapter" id="chapter-middlegame">
+            <h2>中局</h2>
+            <p class="tutorial-meta">战术与局面判断</p>
+            <div class="tutorial-body">
+              <p>中局是棋局中最复杂的阶段，双方子力全面接触。</p>
+              <h3>基本战术</h3>
+              <ul>
+                <li><strong>牵制</strong> — 利用长线子力限制对方移动</li>
+                <li><strong>双击</strong> — 一个棋子同时攻击对方两个棋子</li>
+                <li><strong>闪击</strong> — 移开中间棋子露出后面棋子的攻击</li>
+                <li><strong>引入/引离</strong> — 诱使对方棋子离开关键防御位置</li>
+              </ul>
+              <h3>局面评估要素</h3>
+              <ul>
+                <li>子力对比（棋子价值）</li>
+                <li>中心控制</li>
+                <li>王的安全性</li>
+                <li>兵结构（叠兵、孤兵、通路兵）</li>
+                <li>子力活跃度</li>
+              </ul>
+            </div>
+          </div>
+          <div class="tutorial-chapter" id="chapter-endgame">
+            <h2>残局</h2>
+            <p class="tutorial-meta">残局原理与关键技巧</p>
+            <div class="tutorial-body">
+              <p>残局是棋局的收尾阶段，子力大幅减少，王的作用变得极为重要。</p>
+              <h3>关键残局</h3>
+              <ul>
+                <li><strong>王对王</strong> — 对王距离决定胜负</li>
+                <li><strong>单后杀王</strong> — 利用王配合后逼王到边线</li>
+                <li><strong>单车杀王</strong> — 王和车配合将死对方王</li>
+                <li><strong>兵残局</strong> — 对王与通路兵技巧</li>
+              </ul>
+              <h3>残局原则</h3>
+              <ul>
+                <li>王要积极参战</li>
+                <li>通路兵是关键优势</li>
+                <li>子力交换前先判断残局胜负</li>
+                <li>主动的一方要制造多个弱点</li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 

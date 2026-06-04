@@ -57,6 +57,18 @@ async function init() {
       navigateTo('welcome');
     });
   });
+
+  // 教程侧边导航切换
+  document.querySelectorAll('.tutorial-nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+      document.querySelectorAll('.tutorial-nav-item').forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
+      const chapter = (item as HTMLElement).dataset.chapter;
+      document.querySelectorAll('.tutorial-chapter').forEach(c => c.classList.remove('active'));
+      const target = document.getElementById(`chapter-${chapter}`);
+      if (target) target.classList.add('active');
+    });
+  });
 }
 
 init().catch(console.error);
