@@ -1,124 +1,128 @@
 /**
- * Stockfish WASM 引擎封装
- * UCI 协议适配，支持 AI 走棋计算和局面分析
+ * Stockfish 引擎封装 — Web Worker 方案
+ * 
+ * Stockfish 的 lite-single 版本设计为在 Web Worker 中运行，
+ * Worker 内部自动处理 WASM 加载和 UCI 通信。
+ * 
+ * 用法：
+ *   const engine = getEngine();
+ *   await engine.init();
+ *   engine.setPosition(fen, moves);
+ *   const result = await engine.calculateBestMove(level, timeMs);
  */
 
-export type EvalResult = {
+export interface EvalResult {
   move: string;
   score: number | null;
   mate: number | null;
   depth: number;
   multipv: number;
-};
+}
 
 export type EngineStatus = 'loading' | 'ready' | 'thinking' | 'idle' | 'error';
 
-type EngineListener = {
-  onReady?: () => void;
-  onBestMove?: (bestMove: string, ponder: string) => void;
-  onInfo?: (info: string) => void;
-  onEval?: (evals: EvalResult[]) => void;
-  onError?: (err: string) => void;
-};
-
-const ENGINE_BASENAME = 'stockfish-17.1-lite-single-03e3232';
-
 class StockfishEngine {
-  private engine: any = null;
+  private worker: Worker | null = null;
   private status: EngineStatus = 'loading';
-  private listeners: EngineListener[] = [];
-  private buffer = '';
+  private resolveReady: (() => void) | null = null;
+  private pendingResolve: ((result: EvalResult[]) => void) | null = null;
   private evalResults: EvalResult[] = [];
-  private currentMultipv = 1;
-  private pendingCmds: string[] = [];
+  private cmdQueue: Array<{ cmd: string; resolve: (result: string) => void }> = [];
+  private processingQueue = false;
 
   async init(): Promise<void> {
     return new Promise((resolve, reject) => {
-      const engine = {} as any;
-      
-      // Set up locateFile to find WASM parts in /assets/
-      engine.locateFile = (path: string) => {
-        if (path.endsWith('.wasm') || path.endsWith('.wasm.map')) {
-          const filename = path.split('/').pop() || path;
-          return `/assets/${filename}`;
-        }
-        return `/assets/${ENGINE_BASENAME}.js`;
-      };
+      try {
+        // 创建 Worker — Worker 脚本直接引用 stockfish JS
+        // stockfish 的 JS 设计为同时支持 main thread 和 worker
+        // 在 worker 环境中，它通过 onmessage/postMessage 通信
+        const workerUrl = `/assets/${ENGINE_BASENAME}.js`;
+        
+        // 用 Blob 创建一个包装 Worker，加载 stockfish 脚本
+        const workerCode = `
+          importScripts('${workerUrl}');
+          // Stockfish 已经在这个 Worker 上下文中运行
+          // 它自动设置 onmessage 和 postMessage
+        `;
+        const blob = new Blob([workerCode], { type: 'application/javascript' });
+        const blobUrl = URL.createObjectURL(blob);
+        
+        this.worker = new Worker(blobUrl);
+        URL.revokeObjectURL(blobUrl);
+        
+        this.worker.onmessage = (e: MessageEvent) => {
+          const line = String(e.data);
+          this.handleOutput(line);
+          
+          // 检查引擎是否就绪
+          if (line === 'uciok' && this.resolveReady) {
+            this.status = 'ready';
+            this.resolveReady();
+            this.resolveReady = null;
+          }
+        };
+        
+        this.worker.onerror = (e) => {
+          reject(new Error(`Worker error: ${e.message}`));
+        };
 
-      let resolved = false;
-
-      const script = document.createElement('script');
-      script.src = `/assets/${ENGINE_BASENAME}.js`;
-      script.onload = () => {
-        if (typeof (window as any).Stockfish === 'function') {
-          const INIT_ENGINE = (window as any).Stockfish;
-          const enginePromise = INIT_ENGINE();
-
-          let initAttempts = 0;
-          const checkReady = () => {
-            initAttempts++;
-            if (initAttempts > 200) {
-              reject(new Error('引擎初始化超时'));
-              return;
-            }
-            
-            if (engine._isReady && engine._isReady()) {
-              delete engine._isReady;
-              this.engine = engine;
-              this.setupEngine();
-              if (!resolved) {
-                resolved = true;
-                resolve();
-              }
-            } else {
-              setTimeout(checkReady, 50);
-            }
-          };
-
-          enginePromise.then((sf: any) => {
-            Object.assign(engine, sf);
-            checkReady();
-          }).catch((e: any) => {
-            if (!resolved) { resolved = true; reject(e); }
-          });
-        } else {
-          reject(new Error('Stockfish 构造函数未找到'));
-        }
-      };
-      script.onerror = () => reject(new Error('Stockfish WASM 加载失败'));
-      document.head.appendChild(script);
+        // 发送 UCI 初始化命令
+        // 引擎启动后可能先输出一些版本信息，然后我们需要发送 uci
+        // 引擎本身在 worker 中已经设置了 onmessage，
+        // 但我们需要发送 uci 命令来启动协议协商
+        
+        // 等待一小段时间让 worker 启动，然后发送 uci
+        setTimeout(() => {
+          this.sendRaw('uci');
+        }, 100);
+        
+        this.resolveReady = resolve;
+      } catch (e) {
+        reject(e);
+      }
     });
   }
 
-  private setupEngine() {
-    // 设置输出监听
-    this.engine.print = (line: string) => this.handleOutput(line);
-    this.engine.println = (line: string) => this.handleOutput(line);
-    
-    // 初始化 UCI
-    this.send('uci');
-    this.send('setoption name MultiPV value 1');
-    this.send('setoption name UCI_LimitStrength value true');
-    this.status = 'ready';
-  }
-
   private handleOutput(line: string) {
-    // 解析引擎输出
+    // 解析 bestmove
+    if (line.startsWith('bestmove')) {
+      const match = line.match(/bestmove\s+(\S+)/);
+      if (match && this.pendingResolve) {
+        const move = match[1];
+        
+        // 输出最终评估结果
+        const sortedEvals = [...this.evalResults]
+          .filter(e => e.depth > 0)
+          .sort((a, b) => b.depth - a.depth)
+          .slice(0, 3);
+        
+        if (sortedEvals.length > 0) {
+          this.pendingResolve(sortedEvals);
+        } else {
+          this.pendingResolve([{
+            move, score: null, mate: null, depth: 0, multipv: 1
+          }]);
+        }
+        this.pendingResolve = null;
+        this.status = 'idle';
+      }
+    }
+    
+    // 解析 info 行
     if (line.startsWith('info')) {
-      this.currentMultipv = 1;
-      const pvMatch = line.match(/multipv\s+(\d+)/);
-      if (pvMatch) this.currentMultipv = parseInt(pvMatch[1]);
-      
       const currMove = line.match(/currmove\s+\S+/);
       if (currMove) return;
       
       const evalEntry: EvalResult = {
-        multipv: this.currentMultipv,
+        multipv: 1,
         depth: 0,
         score: null,
         mate: null,
         move: ''
       };
+      
+      const pvMatch = line.match(/multipv\s+(\d+)/);
+      if (pvMatch) evalEntry.multipv = parseInt(pvMatch[1]);
       
       const depthMatch = line.match(/depth\s+(\d+)/);
       if (depthMatch) evalEntry.depth = parseInt(depthMatch[1]);
@@ -135,159 +139,99 @@ class StockfishEngine {
       if (evalEntry.move && evalEntry.depth > 0) {
         this.evalResults.push(evalEntry);
       }
-      
-      this.listeners.forEach(l => l.onInfo?.(line));
     }
-    
-    if (line.startsWith('bestmove')) {
-      const bestMatch = line.match(/bestmove\s+(\S+)(?:\s+ponder\s+(\S+))?/);
-      if (bestMatch) {
-        const bestMove = bestMatch[1];
-        const ponder = bestMatch[2] || '';
-        this.listeners.forEach(l => l.onBestMove?.(bestMove, ponder));
-        
-        const sortedEvals = [...this.evalResults]
-          .filter(e => e.depth > 0)
-          .sort((a, b) => b.depth - a.depth)
-          .slice(0, 3);
-        
-        if (sortedEvals.length > 0) {
-          this.listeners.forEach(l => l.onEval?.(sortedEvals));
-        }
-      }
-    }
-    
-    this.buffer += line + '\n';
   }
 
-  getStatus(): EngineStatus { return this.status; }
+  private sendRaw(cmd: string) {
+    if (this.worker) {
+      this.worker.postMessage(cmd);
+    }
+  }
+
   isReady(): boolean { return this.status === 'ready'; }
   isThinking(): boolean { return this.status === 'thinking'; }
-
-  send(cmd: string) {
-    if (!this.engine) return;
-    this.engine.sendCommand(cmd);
-  }
+  getStatus(): EngineStatus { return this.status; }
 
   setPosition(fen: string, moves: string[] = []) {
-    const posCmd = moves.length > 0
+    const cmd = moves.length > 0
       ? `position fen ${fen} moves ${moves.join(' ')}`
       : `position fen ${fen}`;
-    this.send(posCmd);
+    this.sendRaw(cmd);
   }
 
   setStartPosition(moves: string[] = []) {
-    const posCmd = moves.length > 0
+    const cmd = moves.length > 0
       ? `position startpos moves ${moves.join(' ')}`
       : 'position startpos';
-    this.send(posCmd);
-  }
-
-  calculateBestMove(level: number = 5, timeMs: number = 1000): Promise<EvalResult[]> {
-    return new Promise((resolve) => {
-      this.status = 'thinking';
-      this.evalResults = [];
-      
-      const timeoutId = setTimeout(() => {
-        this.cleanupListener(listener);
-        this.status = 'idle';
-        resolve(this.evalResults.length > 0 ? this.evalResults : []);
-      }, timeMs + 3000);
-      
-      const listener: EngineListener = {
-        onEval: (evals) => {
-          clearTimeout(timeoutId);
-          this.cleanupListener(listener);
-          this.status = 'idle';
-          resolve(evals);
-        },
-        onBestMove: (move) => {
-          if (this.status === 'thinking') {
-            clearTimeout(timeoutId);
-            this.cleanupListener(listener);
-            this.status = 'idle';
-            resolve(this.evalResults.length > 0 ? this.evalResults : [{
-              move, score: null, mate: null, depth: 0, multipv: 1
-            }]);
-          }
-        }
-      };
-      
-      this.addListener(listener);
-      this.setDifficulty(level);
-      this.send(`go movetime ${timeMs}`);
-    });
-  }
-
-  analyzePosition(level: number = 10, timeMs: number = 2000): Promise<EvalResult[]> {
-    return new Promise((resolve) => {
-      this.status = 'thinking';
-      this.evalResults = [];
-      
-      this.send('setoption name MultiPV value 3');
-      
-      const timeoutId = setTimeout(() => {
-        this.cleanupListener(listener);
-        this.status = 'idle';
-        this.send('setoption name MultiPV value 1');
-        resolve(this.evalResults.length > 0 ? this.evalResults : []);
-      }, timeMs + 3000);
-      
-      const listener: EngineListener = {
-        onEval: (evals) => {
-          clearTimeout(timeoutId);
-          this.cleanupListener(listener);
-          this.status = 'idle';
-          this.send('setoption name MultiPV value 1');
-          resolve(evals);
-        },
-        onBestMove: () => {
-          if (this.status === 'thinking') {
-            clearTimeout(timeoutId);
-            this.cleanupListener(listener);
-            this.status = 'idle';
-            this.send('setoption name MultiPV value 1');
-            resolve(this.evalResults.length > 0 ? this.evalResults : []);
-          }
-        }
-      };
-      
-      this.addListener(listener);
-      this.setDifficulty(level);
-      this.send(`go movetime ${timeMs}`);
-    });
+    this.sendRaw(cmd);
   }
 
   private setDifficulty(level: number) {
     const elo = Math.round(1320 + (level - 1) / 9 * (3190 - 1320));
-    this.send(`setoption name UCI_LimitStrength value true`);
-    this.send(`setoption name UCI_Elo value ${Math.min(3190, Math.max(1320, elo))}`);
+    this.sendRaw('setoption name UCI_LimitStrength value true');
+    this.sendRaw(`setoption name UCI_Elo value ${Math.min(3190, Math.max(1320, elo))}`);
+  }
+
+  async calculateBestMove(level: number = 5, timeMs: number = 1000): Promise<EvalResult[]> {
+    return new Promise((resolve) => {
+      this.status = 'thinking';
+      this.evalResults = [];
+      this.pendingResolve = resolve;
+      
+      this.setDifficulty(level);
+      this.sendRaw(`go movetime ${timeMs}`);
+      
+      // 安全兜底：超时后强制 resolve
+      setTimeout(() => {
+        if (this.pendingResolve) {
+          this.sendRaw('stop');
+          this.status = 'idle';
+          this.pendingResolve(this.evalResults.length > 0 ? this.evalResults : []);
+          this.pendingResolve = null;
+        }
+      }, timeMs + 5000);
+    });
+  }
+
+  async analyzePosition(level: number = 10, timeMs: number = 2000): Promise<EvalResult[]> {
+    return new Promise((resolve) => {
+      this.status = 'thinking';
+      this.evalResults = [];
+      this.pendingResolve = resolve;
+      
+      this.sendRaw('setoption name MultiPV value 3');
+      this.setDifficulty(level);
+      this.sendRaw(`go movetime ${timeMs}`);
+      
+      setTimeout(() => {
+        if (this.pendingResolve) {
+          this.sendRaw('stop');
+          this.status = 'idle';
+          this.sendRaw('setoption name MultiPV value 1');
+          this.pendingResolve(this.evalResults.length > 0 ? this.evalResults : []);
+          this.pendingResolve = null;
+        }
+      }, timeMs + 5000);
+    });
   }
 
   stop() {
     if (this.status === 'thinking') {
-      this.send('stop');
+      this.sendRaw('stop');
       this.status = 'idle';
     }
   }
 
-  addListener(l: EngineListener) {
-    this.listeners.push(l);
-  }
-
-  private cleanupListener(l: EngineListener) {
-    this.listeners = this.listeners.filter(L => L !== l);
-  }
-
   terminate() {
-    if (this.engine?.terminate) {
-      this.engine.terminate();
+    if (this.worker) {
+      this.worker.terminate();
+      this.worker = null;
     }
-    this.engine = null;
     this.status = 'error';
   }
 }
 
+const ENGINE_BASENAME = 'stockfish-17.1-lite-single-03e3232';
 let engineInstance: StockfishEngine | null = null;
 
 export function getEngine(): StockfishEngine {
