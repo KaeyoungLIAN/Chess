@@ -42,6 +42,18 @@ async function init() {
   document.getElementById('welcome-analysis')?.addEventListener('click', () => navigateTo('analysis'));
   document.getElementById('welcome-tutorial')?.addEventListener('click', () => navigateTo('tutorial'));
   document.getElementById('welcome-puzzle')?.addEventListener('click', () => navigateTo('puzzle'));
+
+  // 返回首页按钮
+  document.querySelectorAll('.back-to-home').forEach(btn => {
+    btn.addEventListener('click', () => {
+      // 如果 AI 对战视图开着，模拟点击"返回设置"
+      const backToSetup = document.getElementById('btn-back-to-setup');
+      if (backToSetup && !backToSetup.closest('.hidden')) {
+        backToSetup.click();
+      }
+      navigateTo('welcome');
+    });
+  });
 }
 
 init().catch(console.error);
