@@ -9,14 +9,12 @@
 
 /* ── Tokens ── */
 :root {
-  /* Core Palette */
   --primary: #4F46E5;
   --primary-hover: #4338CA;
   --primary-light: #EEF2FF;
   --accent: #EA580C;
   --accent-hover: #D4530A;
 
-  /* Surfaces */
   --bg: #0F172A;
   --bg-secondary: #1E293B;
   --surface: #1E293B;
@@ -24,18 +22,15 @@
   --surface-border: rgba(255,255,255,0.08);
   --overlay: rgba(15,23,42,0.92);
 
-  /* Text */
   --text: #F1F5F9;
   --text-secondary: #94A3B8;
   --text-muted: #64748B;
 
-  /* Feedback */
   --success: #22C55E;
   --danger: #EF4444;
+  --danger-hover: #DC2626;
   --warning: #F59E0B;
-  --info: #3B82F6;
 
-  /* Chess Board */
   --light-square: #E8D0A8;
   --dark-square: #B58863;
   --selected-square: rgba(79,70,229,0.4);
@@ -43,13 +38,11 @@
   --legal-capture-border: rgba(79,70,229,0.6);
   --last-move-bg: rgba(34,197,94,0.25);
 
-  /* Layout */
   --radius: 10px;
   --radius-sm: 6px;
   --shadow: 0 4px 12px rgba(0,0,0,0.2);
   --shadow-lg: 0 8px 30px rgba(0,0,0,0.3);
 
-  /* Typography */
   --font-heading: 'Space Grotesk', sans-serif;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
@@ -80,6 +73,9 @@ body {
   background: rgba(79,70,229,0.3);
   color: var(--text);
 }
+
+/* ── Utilities ── */
+.hidden { display: none !important; }
 
 /* ── App Shell ── */
 #app {
@@ -231,9 +227,6 @@ body {
 
 .square.fading { opacity: 0.5; }
 
-.piece.white-piece { color: #1a1a1a; }
-.piece.black-piece { color: #000; }
-
 /* ── Side Panel ── */
 .side-panel {
   flex: 1;
@@ -296,6 +289,33 @@ body {
   border-color: var(--primary-hover);
 }
 
+.btn-danger {
+  background: transparent;
+  color: var(--danger);
+  border-color: rgba(239,68,68,0.3);
+}
+
+.btn-danger:hover {
+  background: rgba(239,68,68,0.1);
+  border-color: var(--danger);
+}
+
+.btn-ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.btn-ghost:hover {
+  color: var(--text-secondary);
+  background: rgba(255,255,255,0.04);
+}
+
+.btn-full {
+  width: 100%;
+}
+
 .btn-secondary {
   background: transparent;
   border-color: var(--surface-border);
@@ -308,6 +328,12 @@ body {
 .btn-sm {
   padding: 6px 12px;
   font-size: 0.8rem;
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .btn-group {
@@ -398,9 +424,27 @@ body {
   margin-bottom: 8px;
 }
 
-.game-controls .btn {
-  margin-right: 6px;
-  margin-bottom: 4px;
+.game-actions {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.game-actions .btn {
+  flex: 1;
+}
+
+.game-info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.game-turn-indicator {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-secondary);
 }
 
 /* ── Move List ── */
